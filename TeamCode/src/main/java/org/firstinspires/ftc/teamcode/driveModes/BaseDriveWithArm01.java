@@ -1,45 +1,43 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.driveModes;
 
-import android.app.Activity;
 import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.common.Button;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+
 //import org.firstinspires.ftc.teamcode.common.Button;
 //import org.firstinspires.ftc.teamcode.common.Constants;
-
-import org.firstinspires.ftc.teamcode.HardwareDrive;
 //import org.firstinspires.ftc.teamcode.common.pid.CarouselPIDController;
 
-@TeleOp(name="Base Drive", group="Drive")
+@TeleOp(name="Base DriveWithArm01", group="Drive")
 @Disabled
-public class BaseDrive extends OpMode{
+public class BaseDriveWithArm01 extends OpMode{
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
     //Constants constants = new Constants();
     private ElapsedTime runtime = new ElapsedTime();
+    private CRServo serv0;
+    private CRServo serv1;
+    private DcMotor Elevator;
 
 
-
-
-    Button capUpButton = new Button();
-    Button capDropButton = new Button();
-    Button capIntakeButton = new Button();
-    Button setCapMode = new Button();
-    Button carouselButton = new Button();
-    Button carouselButtonInverted = new Button();
-    Button lifterButton = new Button();
-    Button lifterBottomButton = new Button();
-    Button spinInFullButton = new Button();
-    Button spinOutFullButton = new Button();
+      Button capUpButton = new Button();
+      Button capDropButton = new Button();
+      Button capIntakeButton = new Button();
+      Button setCapMode = new Button();
+      Button carouselButton = new Button();
+      Button carouselButtonInverted = new Button();
+      Button lifterButton = new Button();
+      Button lifterBottomButton = new Button();
+      Button spinInFullButton = new Button();
+      Button spinOutFullButton = new Button();
 
     private boolean toggleButton = true;
 
@@ -50,6 +48,9 @@ public class BaseDrive extends OpMode{
 
     @Override
     public void init() {
+        serv0 = hardwareMap.get(CRServo.class, "serv0");
+        serv1 = hardwareMap.get(CRServo.class, "serv1");
+        Elevator = hardwareMap.get(DcMotor.class, "Elevator");
         robot.init(hardwareMap);
 
         telemetry.addData("Say", "Hello Driver");
@@ -59,8 +60,8 @@ public class BaseDrive extends OpMode{
 
     @Override
     public void init_loop() {
-//        robot.lifter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        robot.lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//       robot.lifter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//       robot.lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class BaseDrive extends OpMode{
     @Override
     public void loop() {
         UpdatePlayer1();
-        //UpdatePlayer2();
+//       UpdatePlayer2();
         UpdateButton();
         UpdateTelemetry();
     }
@@ -79,12 +80,12 @@ public class BaseDrive extends OpMode{
 
         DriveTrainBase(drivePower);
         DriveTrainSpeed();
-        //Capping();
+//        Capping();
         DriveMicroAdjust(0.4);
         //OscillateServo();
     }
 
-    /*void UpdatePlayer2(){
+ /*   void UpdatePlayer2(){
         Carousel();
         Lifter();
         SpinIntake();
@@ -97,7 +98,7 @@ public class BaseDrive extends OpMode{
         telemetry.addData("R", gamepad1.right_stick_x);
 //        telemetry.addData("Arm Position", robot.lifter.getCurrentPosition());
 
-//        telemetry.addData("Touch Sensor", robot.digitalTouch.getState());
+      //  telemetry.addData("Touch Sensor", robot.digitalTouch.getState());
         telemetry.update();
     }
 
@@ -106,8 +107,6 @@ public class BaseDrive extends OpMode{
         capIntakeButton.update(gamepad1.a);
         capUpButton.update(gamepad1.y);
         setCapMode.update(gamepad1.x);
-
-
         carouselButton.update(gamepad2.a);
         carouselButtonInverted.update(gamepad2.b);
         lifterButton.update(gamepad2.y);
@@ -133,17 +132,23 @@ public class BaseDrive extends OpMode{
 
     void DriveTrainBase(double drivePower){
         double directionX = Math.pow(gamepad1.left_stick_x, 1); //Strafe
-        double directionY = -Math.pow(gamepad1.left_stick_y, 1); //Forward
-        double directionR = Math.pow(gamepad1.right_stick_x, 1); //Turn
+        double directionY = Math.pow(gamepad1.left_stick_y, 1); //Forward
+        double directionR = -Math.pow(gamepad1.right_stick_x, 1); //Turn
+
+//        robot.lf.setPower((directionY + directionR + directionX) * drivePower);
+//        robot.rf.setPower((-directionY + directionR + directionX) * drivePower);
+//        robot.lb.setPower((directionY + directionR - directionX) * drivePower);
+//        robot.rb.setPower((-directionY + directionR - directionX) * drivePower);
 
 
-        robot.lf.setPower((directionY + directionR + directionX) * drivePower);
-        robot.rf.setPower((directionY - directionR - directionX) * drivePower);
-        robot.lb.setPower((directionY + directionR - directionX) * drivePower);
-        robot.rb.setPower((directionY - directionR + directionX) * drivePower);
+        robot.lf.setPower((directionY + directionR - directionX) * drivePower);
+        robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
+        robot.lb.setPower((directionY + directionR + directionX) * drivePower);
+        robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
 
-
+//
     }
+
 
     void DriveMicroAdjust(double power){
         if (gamepad1.dpad_up){
@@ -199,7 +204,7 @@ public class BaseDrive extends OpMode{
         return drivePower;
     }
 
-    /*void Lifter() {
+/*    void Lifter() {
         int position = robot.lifter.getCurrentPosition();
         if (lifterButton.is(Button.State.TAP)) {
             if (position >= (constants.elevatorPositionTop - 10)) {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.driveModes;
 
 import android.view.View;
 
@@ -6,21 +6,22 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Base Drive02_gripper", group = "Drive")
+import org.firstinspires.ftc.teamcode.common.Button;
+import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+
+@TeleOp(name = "Base Drive01", group = "Drive")
 @Disabled
-public class BaseDrive02_gripper extends LinearOpMode {
+public class BaseDrive01 extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
     //Constants constants = new Constants();
-    private CRServo serv0;
     private ElapsedTime runtime = new ElapsedTime();
 
     Button lifterButton = new Button();
     Button lifterBottomButton = new Button();
-
 //      Button capUpButton = new Button();
 //      Button capDropButton = new Button();
 //      Button capIntakeButton = new Button();
@@ -39,7 +40,6 @@ public class BaseDrive02_gripper extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        serv0 = hardwareMap.get(CRServo.class, "serv0");
         robot.init(hardwareMap);
         telemetry.addData("Say", "Hello Driver");
         runtime.reset();
@@ -97,15 +97,6 @@ public class BaseDrive02_gripper extends LinearOpMode {
         //       setCapMode.update(gamepad1.x);
         //       spinInFullButton.update(gamepad2.dpad_down);
         //       spinOutFullButton.update(gamepad2.dpad_up);
-//                if(gamepad2.a){
-//                    serv0.setPower(0.2);
-//                }
-        if (gamepad2.left_trigger > 0.01) {
-            serv0.setPower(0.22 * gamepad2.left_trigger - 0);}
-                else if  (gamepad2.right_trigger > 0.01) {
-            serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
-        }
-
     }
 
     private void DriveTrainBase(double drivePower) {
@@ -113,7 +104,6 @@ public class BaseDrive02_gripper extends LinearOpMode {
         double directionY = Math.pow(gamepad1.left_stick_y, 1); //Forward
         double directionR = -Math.pow(gamepad1.right_stick_x, 1); //Turn
         double directionL = Math.pow(gamepad2.right_stick_y, 1); //Lift
-
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
         robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
@@ -127,24 +117,24 @@ public class BaseDrive02_gripper extends LinearOpMode {
 
     private void DriveMicroAdjust(double power) {
         if (gamepad1.dpad_up) {
-            robot.lf.setPower(-power);
-            robot.rf.setPower(+power);
-            robot.lb.setPower(-power);
-            robot.rb.setPower(+power);
-        } else if (gamepad1.dpad_down) {
-            robot.lf.setPower(+power);
-            robot.rf.setPower(-power);
-            robot.lb.setPower(+power);
-            robot.rb.setPower(-power);
-        } else if (gamepad1.dpad_right) {
             robot.lf.setPower(power);
             robot.rf.setPower(power);
             robot.lb.setPower(power);
             robot.rb.setPower(power);
-        } else if (gamepad1.dpad_left) {
+        } else if (gamepad1.dpad_down) {
             robot.lf.setPower(-power);
             robot.rf.setPower(-power);
             robot.lb.setPower(-power);
+            robot.rb.setPower(-power);
+        } else if (gamepad1.dpad_right) {
+            robot.lf.setPower(power);
+            robot.rf.setPower(-power);
+            robot.lb.setPower(-power);
+            robot.rb.setPower(power);
+        } else if (gamepad1.dpad_left) {
+            robot.lf.setPower(-power);
+            robot.rf.setPower(power);
+            robot.lb.setPower(power);
             robot.rb.setPower(-power);
         }
 

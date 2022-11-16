@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -37,13 +37,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+
 /**
 The Purpose of this Program is to run calibration on Forward, Reverse, Spin and Strafe
  */
 
-@Autonomous(name="Robot: Auto Drive By Distance 04", group="Robot")
+@Autonomous(name="Robot: Auto Drive By Distance 02", group="Robot")
 @Disabled
-public class RobotAutoDriveByDistance_Linear04 extends LinearOpMode {
+public class RobotAutoDriveByDistance_Linear02 extends LinearOpMode {
 
     HardwareDrive robot = new HardwareDrive();
 
@@ -66,36 +68,33 @@ public class RobotAutoDriveByDistance_Linear04 extends LinearOpMode {
 
         RobotLog.d("5921","Step4");
 
-        //VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
-        //VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
-        //VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
+    // Calibrate Forward and Reverse
+//        DriveForward(524*10,0.35); // 47.5 cnts/inch, old - 570, new 43.651 cnts/inch
+//        DriveStop(0);
+//        sleep(3000);
+//        DriveReverse(524*10,0.35);
+//        DriveStop(0);
+//        sleep(500);
 
+    // Calibrate Right and Left
+        SpinRight(4*920,0.25); // 76.67 cnts/inch
+        DriveStop(0);
+        sleep(3000);
+        SpinLeft(4*920,0.25);
+        DriveStop(0);
+        sleep(500);
 
-        //PUT AUTONOMOUS SCRIPT HERE
+    // Calibrate StrafeRight and StrafeLeft
+//        StrafeRight(595*10,0.25); // 45.83 cnts/inch, old-550, new 49.549 cnts/inch
+//        DriveStop(0);
+//        sleep(3000);
+//        StrafeLeft(595*10,0.25);
+//        DriveStop(0);
+//        sleep(500);
 
-        //SCRIPT FOR STARTING AT A2 or F5. Not sure about the 100% power, the robot seems to do a fair amount of coasting.
-        SpinLeft(290,100); //face towards cones
-        DriveForward(1048,100); //move robot to pad A3, we're basing all operations on row 3
-//        for (int i=1; i<4; i++){ //5 is arbitary, adjust depending on how fast the robot is
-//            PickUpCone(); //pick up cone
-//            StrafeRight(1571,100); //move to high pole
-//            DepositCone(3); //drop cone on high pole (height 3)
-//            StrafeLeft(1571,100); //strafe back to cone area
-//        }
-        DriveReverse(2095,100); //go to our terminal
-
-        /*SCRIPT FOR STARTING AT A5 or F2
-        SpinRight(290,100); //face towards cones
-        DriveForward(1048,100); //move robot to pad F3, we're basing all operations on row 3
-        for (int i=0; i<5; i++){ //5 is arbitary, adjust depending on how fast the robot is
-            PickUpCone(); //pick up cone
-            StrafeLeft(1571,100); //move to high pole
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeRight(1571,100); //strafe back to cone area
-        }
-        DriveReverse(2095,100); //go to our terminal
-         */
-
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);
     }
 
     // StrafeRight Function
@@ -310,47 +309,6 @@ public class RobotAutoDriveByDistance_Linear04 extends LinearOpMode {
             RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
-    // Lifter function
-//    private void DepositCone(int junctionLevel){
-//        //assumes lift is at bottom and claw is closed
-//        switch (junctionLevel) {
-//            case 1:
-//                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
-//                break;
-//            case 2:
-//                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
-//                break;
-//            case 3:
-//                targetPos = null; // and this would be still higher
-//                break;
-//        }
-//        //raise arm
-//        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.lift.setPower(0.35);
-
-//        while (opModeIsActive() && (robot.lift.isBusy())) {
-//            telemetry.addData("Lifter lifting...");
-//        }
-//
-//        //release cone
-//        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//
-//        //lower arm
-//        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
-//        robot.lift.setPower(0.35);
-//    }
-//
-//    //Pick up cone function
-//    private void PickUpCone(){
-//        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//    }
 
     // DriveStop Function
     private void DriveStop(int i) {

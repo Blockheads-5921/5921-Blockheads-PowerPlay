@@ -1,25 +1,21 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.driveModes;
 
-import android.app.Activity;
 import android.view.View;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 //import org.firstinspires.ftc.teamcode.common.Button;
 //import org.firstinspires.ftc.teamcode.common.Constants;
 
-import org.firstinspires.ftc.teamcode.HardwareDrive;
+import org.firstinspires.ftc.teamcode.common.Button;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 //import org.firstinspires.ftc.teamcode.common.pid.CarouselPIDController;
 
 @TeleOp(name="Base Drive", group="Drive")
-//@Disabled
+@Disabled
 public class BaseDrive extends OpMode{
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
@@ -134,7 +130,6 @@ public class BaseDrive extends OpMode{
         double directionX = Math.pow(gamepad1.left_stick_x, 1); //Strafe
         double directionY = -Math.pow(gamepad1.left_stick_y, 1); //Forward
         double directionR = Math.pow(gamepad1.right_stick_x, 1); //Turn
-
 
 
         robot.lf.setPower((directionY + directionR + directionX) * drivePower);

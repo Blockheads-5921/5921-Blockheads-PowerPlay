@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 FIRST. All rights reserved.
+/* Copyright (c) 2020 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -27,13 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.concepts;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -51,9 +52,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "TensorFlow_Conf50", group = "Concept")
+@TeleOp(name = "Concept: TensorFlow Object Detection Switchable Cameras", group = "Concept")
 @Disabled
-public class TensorFlow_Conf50 extends LinearOpMode {
+public class ConceptTensorFlowObjectDetectionSwitchableCameras extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -64,7 +65,6 @@ public class TensorFlow_Conf50 extends LinearOpMode {
      */
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
-
 
     private static final String[] LABELS = {
             "1 Bolt",
@@ -85,13 +85,21 @@ public class TensorFlow_Conf50 extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "AaKd3K3/////AAABmbEXeRKKtUzcqa1Tm5CDOkdJ5/gdsHlZH8to976NByBP9kxz11aApGntLM40oaXUm4wvKkzhoz8wmwEOHWBce+Mx3M1l/8uQ3Ys4BZoWEKt+b+LCVCOg8oxNplp3WJFw0jgVLetgTfL/NFtI4jlygxlPkgaHlRKFWyJiZ5nX84+brBTBCL1rekx78AsFElJbTgeI+GNr8GNjnIuXhRQ+WWDiriWD04abmrmyh4HoVVTmElg+/9zdKW9seASyq/4/Z4kQt9ViprVbSD2MjxgBetXJ4PTWm4KAzkJE/gejgoiCSPGKecdCav+un5wFPRw5Y/AogVpBHDWeHmXHkgfG+NiMwK/2Ebyu3/PsLdyNDJxd";
+            " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
      */
     private VuforiaLocalizer vuforia;
+
+    /**
+     * Variables used for switching cameras.
+     */
+    private WebcamName webcam1, webcam2;
+    private SwitchableCamera switchableCamera;
+    private boolean oldLeftBumper;
+    private boolean oldRightBumper;
 
     /**
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
@@ -130,27 +138,23 @@ public class TensorFlow_Conf50 extends LinearOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Objects Detected", updatedRecognitions.size());
+                    doCameraSwitching();
+                    List<Recognition> recognitions = tfod.getRecognitions();
+                    telemetry.addData("# Objects Detected", recognitions.size());
+                    // step through the list of recognitions and display image size and position
+                    // Note: "Image number" refers to the randomized image orientation/number
+                    for (Recognition recognition : recognitions) {
+                        double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
+                        double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+                        double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
+                        double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
 
-                        // step through the list of recognitions and display image position/size information for each one
-                        // Note: "Image number" refers to the randomized image orientation/number
-                        for (Recognition recognition : updatedRecognitions) {
-                            double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
-                            double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-                            double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
-                            double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
-
-                            telemetry.addData(""," ");
-                            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
-                            telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
-                            telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
-                        }
-                        telemetry.update();
+                        telemetry.addData(""," ");
+                        telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+                        telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
+                        telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
                     }
+                    telemetry.update();
                 }
             }
         }
@@ -166,10 +170,18 @@ public class TensorFlow_Conf50 extends LinearOpMode {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "log920");
+
+        // Indicate that we wish to be able to switch cameras.
+        webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+        parameters.cameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Set the active camera to Webcam 1.
+        switchableCamera = (SwitchableCamera) vuforia.getCamera();
+        switchableCamera.setActiveCamera(webcam1);
     }
 
     /**
@@ -179,15 +191,36 @@ public class TensorFlow_Conf50 extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.50f;
+        tfodParameters.minResultConfidence = 0.75f;
         tfodParameters.isModelTensorFlow2 = true;
-      //  tfodParameters.inputSize = 300;
-        tfodParameters.inputSize = 400;
+        tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
         // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
+
+    private void doCameraSwitching() {
+        // If the left bumper is pressed, use Webcam 1.
+        // If the right bumper is pressed, use Webcam 2.
+        boolean newLeftBumper = gamepad1.left_bumper;
+        boolean newRightBumper = gamepad1.right_bumper;
+        if (newLeftBumper && !oldLeftBumper) {
+            switchableCamera.setActiveCamera(webcam1);
+        } else if (newRightBumper && !oldRightBumper) {
+            switchableCamera.setActiveCamera(webcam2);
+        }
+        oldLeftBumper = newLeftBumper;
+        oldRightBumper = newRightBumper;
+
+        if (switchableCamera.getActiveCamera().equals(webcam1)) {
+            telemetry.addData("activeCamera", "Webcam 1");
+            telemetry.addData("Press RightBumper", "to switch to Webcam 2");
+        } else {
+            telemetry.addData("activeCamera", "Webcam 2");
+            telemetry.addData("Press LeftBumper", "to switch to Webcam 1");
+        }
     }
 }

@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.common.cv;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaCurrentGame;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 
-@TeleOp(name = "Basic_Jakob03 (Blocks to Java)")
+@TeleOp(name = "Log_cam02 (Blocks to Java)")
 @Disabled
-public class Basic_Jakob03 extends LinearOpMode {
+public class Log_cam02 extends LinearOpMode {
 
   private VuforiaCurrentGame vuforiaPOWERPLAY;
 
@@ -18,13 +19,12 @@ public class Basic_Jakob03 extends LinearOpMode {
    * This function is executed when this Op Mode is selected from the Driver Station.
    */
   @Override
-
   public void runOpMode() {
     vuforiaPOWERPLAY = new VuforiaCurrentGame();
 
     vuforiaPOWERPLAY.initialize(
         "", // vuforiaLicenseKey
-        hardwareMap.get(WebcamName.class, "log920"), // cameraName
+        hardwareMap.get(WebcamName.class, "log921"), // cameraName
         "", // webcamCalibrationFilename
         false, // useExtendedTracking
         true, // enableCameraMonitoring

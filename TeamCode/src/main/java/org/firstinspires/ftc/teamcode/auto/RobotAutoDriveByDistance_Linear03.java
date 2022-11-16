@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -37,13 +37,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+
 /**
 The Purpose of this Program is to run calibration on Forward, Reverse, Spin and Strafe
  */
 
-@Autonomous(name="Robot: Auto Drive By Distance 02", group="Robot")
+@Autonomous(name="Robot: Auto Drive By Distance 05", group="Robot")
 @Disabled
-public class RobotAutoDriveByDistance_Linear02 extends LinearOpMode {
+public class RobotAutoDriveByDistance_Linear03 extends LinearOpMode {
 
     HardwareDrive robot = new HardwareDrive();
 
@@ -67,20 +69,25 @@ public class RobotAutoDriveByDistance_Linear02 extends LinearOpMode {
         RobotLog.d("5921","Step4");
 
     // Calibrate Forward and Reverse
-//        DriveForward(524*10,0.35); // 47.5 cnts/inch, old - 570, new 43.651 cnts/inch
-//        DriveStop(0);
-//        sleep(3000);
-//        DriveReverse(524*10,0.35);
-//        DriveStop(0);
-//        sleep(500);
-
-    // Calibrate Right and Left
-        SpinRight(4*920,0.25); // 76.67 cnts/inch
+//        //DriveForward(524*10,0.35); // 47.5 cnts/inch, old - 570, new 43.651 cnts/inch
+        DriveForward(1045,0.35); // 1 pad
+//        DriveForward(1017+1017,0.35); // 2 pad
+//        DriveForward(1179+1017*2,0.35); // 3 pad
+//        DriveForward(1179+1017*3,0.35); // 4 pad
+//        DriveForward(1179+1017*4,0.35); // 5 pad
         DriveStop(0);
         sleep(3000);
-        SpinLeft(4*920,0.25);
+        DriveReverse(1045,0.35);
         DriveStop(0);
         sleep(500);
+
+    // Calibrate Right and Left
+//        SpinRight(4*920,0.25); // 76.67 cnts/inch
+//        DriveStop(0);
+//        sleep(3000);
+//        SpinLeft(4*920,0.25);
+//        DriveStop(0);
+//        sleep(500);
 
     // Calibrate StrafeRight and StrafeLeft
 //        StrafeRight(595*10,0.25); // 45.83 cnts/inch, old-550, new 49.549 cnts/inch

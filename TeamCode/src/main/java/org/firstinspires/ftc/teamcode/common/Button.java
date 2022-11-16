@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.common;
 
 //## Both Button and ToggleButtion are already part of Android Studio.
 public class Button {
