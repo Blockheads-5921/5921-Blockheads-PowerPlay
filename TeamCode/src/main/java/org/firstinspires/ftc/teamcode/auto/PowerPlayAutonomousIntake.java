@@ -116,6 +116,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
         robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -130,6 +131,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.lf.setPower(drive_power);
         robot.rf.setPower(drive_power);
         robot.lb.setPower(drive_power);
@@ -153,6 +155,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
         robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -167,6 +170,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.lf.setPower(drive_power);
         robot.rf.setPower(drive_power);
         robot.lb.setPower(drive_power);
@@ -189,6 +193,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
         robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -203,6 +208,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.lf.setPower(drive_power);
         robot.rf.setPower(drive_power);
         robot.lb.setPower(drive_power);

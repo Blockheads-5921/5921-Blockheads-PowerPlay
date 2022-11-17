@@ -29,4 +29,10 @@ public class Constants {
     //Velocity of Spin
     public double spinClockwise = 1600;
     public double spinCounterClockwise = - 1600;
+
+    public enum ELEVATOR_STATES {
+        TOP,
+        MIDDLE,
+        BOTTOM
+    }
 }
