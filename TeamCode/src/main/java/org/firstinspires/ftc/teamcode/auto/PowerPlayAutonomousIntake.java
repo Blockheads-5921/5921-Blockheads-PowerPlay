@@ -37,9 +37,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 
-@Autonomous(name="Robot: PowerPlayAutonomous", group="Robot")
+@Autonomous(name="Robot: PowerPlayAutonomousIntake", group="Robot")
 //@Disabled
-public class PowerPlayAutonomous extends LinearOpMode {
+public class PowerPlayAutonomousIntake extends LinearOpMode {
 
     HardwareDrive robot = new HardwareDrive();
 
@@ -69,6 +69,9 @@ public class PowerPlayAutonomous extends LinearOpMode {
 
         //PUT AUTONOMOUS SCRIPT HERE
 
+        CalibrateLifter(50);
+
+        /*
         //SCRIPT FOR STARTING AT A2 or F5
         double autoPower = 0.12;
         int sleepTime = 1000;
@@ -90,6 +93,8 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
         DriveReverse(2095,autoPower); //go to our terminal
         DriveStop(0);
+        */
+        */
 
         /*SCRIPT FOR STARTING AT A5 or F2
         SpinRight(290,100); //face towards cones
@@ -318,49 +323,54 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-//    // Lifter function
-//    private void DepositCone(int junctionLevel){
-//        //assumes lift is at bottom and claw is closed
-//        switch (junctionLevel) {
-//            case 1:
-//                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
-//                break;
-//            case 2:
-//                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
-//                break;
-//            case 3:
-//                targetPos = null; // and this would be still higher
-//                break;
-//        }
-//        //raise arm
-//        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.lift.setPower(0.35);
-//
-//        while (opModeIsActive() && (robot.lift.isBusy())) {
-//            telemetry.addData("Lifter lifting...");
-//        }
-//        
-//        //release cone
-//        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//
-//        //lower arm
-//        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
-//        robot.lift.setPower(0.35);
-//    }
-//
-//    //Pick up cone function
-//    private void PickUpCone(){
-//        //assumes gripper is open and arm is down; should be this way
-//        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//    }
+    private void CalibrateLifter(int numberClicks){
+        robot.lift.setTargetPosition(numberClicks);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.5);
+    }
+    // Lifter function
+    private void DepositCone(int junctionLevel){
+        //assumes lift is at bottom and claw is closed
+        switch (junctionLevel) {
+            case 1:
+                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
+                break;
+            case 2:
+                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
+                break;
+            case 3:
+                targetPos = null; // and this would be still higher
+                break;
+        }
+        //raise arm
+        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.35);
 
-    // DriveStop Function
+        while (opModeIsActive() && (robot.lift.isBusy())) {
+            telemetry.addData("Lifter lifting...");
+        }
+
+        //release cone
+        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
+        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.gripper.setPower(0.35);
+
+        //lower arm
+        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
+        robot.lift.setPower(0.35);
+    }
+
+    //Pick up cone function
+    private void PickUpCone(){
+        //assumes gripper is open and arm is down; should be this way
+        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
+        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.gripper.setPower(0.35);
+    }
+
+// DriveStop Function
     private void DriveStop(double i) {
         if (i == 0){
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
