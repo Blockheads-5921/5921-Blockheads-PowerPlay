@@ -1,2 +1,4 @@
 *.build linguist-detectable
 *.gradle linguist-detectable
+*.xml linguist-detectable
+*.md linguist-detectable
