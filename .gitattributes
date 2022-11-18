@@ -2,3 +2,4 @@
 *.gradle linguist-detectable
 *.xml linguist-detectable
 *.md linguist-detectable
+libs/* linguist-vendored
