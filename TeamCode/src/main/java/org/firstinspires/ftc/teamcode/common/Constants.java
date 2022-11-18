@@ -30,9 +30,9 @@ public class Constants {
     public double spinClockwise = 1600;
     public double spinCounterClockwise = - 1600;
 
-    public enum ELEVATOR_STATES {
-        TOP,
+    public enum ELEVATOR_POSITIONS {
+        BOTTOM,
         MIDDLE,
-        BOTTOM
+        TOP
     }
 }
