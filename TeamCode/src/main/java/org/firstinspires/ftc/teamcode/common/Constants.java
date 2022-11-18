@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.common;
 
+import java.util.HashMap;
+
 public class Constants {
 
     //Elevator Motor Positions
@@ -30,7 +32,7 @@ public class Constants {
     public double spinClockwise = 1600;
     public double spinCounterClockwise = - 1600;
 
-    public enum ELEVATOR_POSITIONS {
+    public static enum ELEVATOR_POSITIONS {
         BOTTOM,
         MIDDLE,
         TOP

@@ -37,24 +37,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+import org.firstinspires.ftc.teamcode.common.Constants;
 
 
 @Autonomous(name="Robot: PowerPlayAutonomous", group="Robot")
 //@Disabled
 public class PowerPlayAutonomous extends LinearOpMode {
 
+    Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
-
     private final ElapsedTime
     runtime = new ElapsedTime();
 
-// Unused, delete later?
-//   static final double     FORWARD_SPEED = 0.6;
-//   static final double     TURN_SPEED    = 0.5;
-
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap); // initiates the hardware Map
+        robot.init(hardwareMap); 
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
@@ -62,17 +59,16 @@ public class PowerPlayAutonomous extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
         RobotLog.d("5921","Step4");
 
-        //VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
-        //VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
-        //VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
+        // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
+        // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
+        // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
 
 
-        //PUT AUTONOMOUS SCRIPT HERE
+        // PUT AUTONOMOUS SCRIPT HERE
 
-        //SCRIPT FOR STARTING AT A2 or F5
+        // SCRIPT FOR STARTING AT A2 or F5
         double autoPower = 0.12;
         int sleepTime = 1000;
         SpinLeft(920,autoPower); //face towards cones
@@ -108,8 +104,22 @@ public class PowerPlayAutonomous extends LinearOpMode {
 
     }
 
-    // StrafeRight Function
-    private void StrafeRight(int straferight_encoder_pulses, double drivePower) {
+    private void DriveStop(double i) {
+        if (i == 0){
+            robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+        else{
+            robot.lf.setPower(i);
+            robot.rf.setPower(i);
+            robot.lb.setPower(i);
+            robot.rb.setPower(i);
+        }
+    }
+
+    private void StrafeRight(int straferightEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -119,10 +129,10 @@ public class PowerPlayAutonomous extends LinearOpMode {
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        robot.lf.setTargetPosition(-straferight_encoder_pulses);
-        robot.rf.setTargetPosition(-straferight_encoder_pulses);
-        robot.lb.setTargetPosition(straferight_encoder_pulses);
-        robot.rb.setTargetPosition(straferight_encoder_pulses);
+        robot.lf.setTargetPosition(-straferightEncoderPulses);
+        robot.rf.setTargetPosition(-straferightEncoderPulses);
+        robot.lb.setTargetPosition(straferightEncoderPulses);
+        robot.rb.setTargetPosition(straferightEncoderPulses);
 
         robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -133,20 +143,16 @@ public class PowerPlayAutonomous extends LinearOpMode {
         robot.lb.setPower(drivePower);
         robot.rb.setPower(drivePower);
 
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", straferight_encoder_pulses);
+        // update the telemetry monitor
+        while (opModeIsActive() && (robot.lf.isBusy())) {
+            telemetry.addData("Running to", " %7d ", straferightEncoderPulses);
             telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
             telemetry.update();
             RobotLog.d("StrafeRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
 
-    // StrafeLeft Function
     private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
-
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -180,7 +186,6 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-    // SpinLeft Function
     private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
 
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -216,7 +221,6 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-    // SpinRight Function
     private void SpinRight(int spinrightEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -251,7 +255,6 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-    // DriveForward Function
     private void DriveForward(int forwardEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -286,7 +289,6 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-    // DriveReverse Function
     private void DriveReverse(int reverseEncoderPulses, double drivePower){
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -321,62 +323,47 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-//    // Lifter function
-//    private void DepositCone(int junctionLevel){
-//        //assumes lift is at bottom and claw is closed
-//        switch (junctionLevel) {
-//            case 1:
-//                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
-//                break;
-//            case 2:
-//                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
-//                break;
-//            case 3:
-//                targetPos = null; // and this would be still higher
-//                break;
-//        }
-//        //raise arm
-//        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.lift.setPower(0.35);
-//
-//        while (opModeIsActive() && (robot.lift.isBusy())) {
-//            telemetry.addData("Lifter lifting...");
-//        }
-//        
-//        //release cone
-//        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//
-//        //lower arm
-//        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-//        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
-//        robot.lift.setPower(0.35);
-//    }
-//
-//    //Pick up cone function
-//    private void PickUpCone(){
-//        //assumes gripper is open and arm is down; should be this way
-//        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
-//        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        robot.gripper.setPower(0.35);
-//    }
 
-    // DriveStop Function
-    private void DriveStop(double i) {
-        if (i == 0){
-            robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    // Lifter function
+    private void DepositCone(junctionLevel){
+        //assumes lift is at bottom and claw is closed
+        switch (junctionLevel) {
+            case 1:
+                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
+                break;
+            case 2:
+                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
+                break;
+            case 3:
+                targetPos = null; // and this would be still higher
+                break;
         }
-        else{
-            robot.lf.setPower(i);
-            robot.rf.setPower(i);
-            robot.lb.setPower(i);
-            robot.rb.setPower(i);
+        //raise arm
+        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.35);
+
+        while (opModeIsActive() && (robot.lift.isBusy())) {
+            telemetry.addData("Lifter lifting...");
         }
+
+        //release cone
+        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
+        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.gripper.setPower(0.35);
+
+        //lower arm
+        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
+        robot.lift.setPower(0.35);
+    }
+
+    //Pick up cone function
+    private void PickUpCone(){
+        //assumes gripper is open and arm is down; should be this way
+        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
+        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.gripper.setPower(0.35);
     }
 
 }
