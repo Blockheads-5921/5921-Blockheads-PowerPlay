@@ -3,6 +3,7 @@
 *.xml linguist-detectable
 *.md linguist-detectable
 *.properties linguist-detectable
+*.bat linguist-detectable
 libs/** linguist-vendored
 docs/** linguist-vendored
 .idea/** linguist-vendored
