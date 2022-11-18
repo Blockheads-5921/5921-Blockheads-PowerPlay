@@ -2,6 +2,7 @@
 *.gradle linguist-detectable
 *.xml linguist-detectable
 *.md linguist-detectable
+*.properties linguist-detectable
 libs/** linguist-vendored
 docs/** linguist-vendored
 .idea/** linguist-vendored
