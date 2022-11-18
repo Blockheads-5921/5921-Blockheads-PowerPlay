@@ -323,10 +323,8 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-
-    // Lifter function
-    private void DepositCone(junctionLevel){
-        //assumes lift is at bottom and claw is closed
+    /*private void DepositCone(int junctionLevel){
+        // assumes lift is at bottom and claw is closed
         switch (junctionLevel) {
             case 1:
                 targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
@@ -364,6 +362,5 @@ public class PowerPlayAutonomous extends LinearOpMode {
         robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
         robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.gripper.setPower(0.35);
-    }
-
+    }*/
 }
