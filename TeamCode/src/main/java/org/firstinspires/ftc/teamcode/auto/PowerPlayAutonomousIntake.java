@@ -82,7 +82,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
             Drive("Strafe",-36,autoPower); //strafe back to cone area
             DriveStop(0);
         }
-        DriveReverse(2095,autoPower); //go to our terminal
+        Drive("Normal",-48,autoPower); //go to our terminal
         DriveStop(0);
 
     }
@@ -91,20 +91,20 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
     private void Drive(String movement_type, int inches_or_degrees, double drive_power) {
         //Moves the robot in the specified movement type. Positive Normal drives forwards, 
         //positive Strafe drives left, and positive Rotate spins the robot clockwise.
-
-        int[] motorDirCoefs = {0,0,0,0}
+        int[] motorDirCoefs = {0,0,0,0};
+        int encoder_pulses = 0;
         switch(movement_type) {
             case "Normal":
-                motorDirCoefs = {-1,1,-1,1};
-                int encoder_pulses = 43.651*inches_or_degrees;
+                motorDirCoefs = new int[] {-1, 1, -1, 1};
+                encoder_pulses = 44*inches_or_degrees;
                 break;
             case "Strafe":
-                motorDirCoefs = {-1,-1,1,1};
-                int encoder_pulses = 49.549*inches_or_degrees;
+                motorDirCoefs = new int[] {-1,-1,1,1};
+                encoder_pulses = 50*inches_or_degrees;
                 break;
             case "Rotate":
-                motorDirCoefs = {-1,-1,-1,-1};
-                int encoder_pulses = 10.222*inches_or_degrees;
+                motorDirCoefs = new int[]{-1,-1,-1,-1};
+                encoder_pulses = 10*inches_or_degrees;
                 break;
             
         }
@@ -138,6 +138,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
     // Lifter function
     private void DepositCone(int junctionLevel){
         //assumes lift is at bottom
+        int targetPos = 0;
         switch (junctionLevel) {
             case 1:
                 targetPos = Constants.elevatorPositionLow;
