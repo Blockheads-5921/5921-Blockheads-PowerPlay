@@ -50,6 +50,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
     @Override
     public void runOpMode() {
         robot.init(hardwareMap); // initiates the hardware Map
+        serv0 = hardwareMap.get(CRServo.class, "serv0");
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
