@@ -45,7 +45,7 @@ The Purpose of this Program is to run calibration on Forward, Reverse, Spin and 
 
 @Autonomous(name="Robot: Auto Drive By Distance 04b", group="Robot")
 @Disabled
-public class w extends LinearOpMode {
+public class RobotAutoDriveByDistance_Linear04b extends LinearOpMode {
 
     HardwareDrive robot = new HardwareDrive();
 
