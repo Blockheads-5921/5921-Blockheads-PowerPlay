@@ -323,7 +323,7 @@ public class PowerPlayAutonomous extends LinearOpMode {
         }
     }
 
-
+/*
     // Lifter function
     private void DepositCone(junctionLevel){
         //assumes lift is at bottom and claw is closed
@@ -365,5 +365,6 @@ public class PowerPlayAutonomous extends LinearOpMode {
         robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.gripper.setPower(0.35);
     }
-
+    */
 }
+
