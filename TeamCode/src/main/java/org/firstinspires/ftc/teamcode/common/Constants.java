@@ -6,8 +6,9 @@ public class Constants {
 
     //Elevator Motor Positions
     public static int elevatorPositionDown = 0; //Rest
-    public static int elevatorPositionTop = -2900; //Extended
-    public int elevatorPositionMid = -1200;
+    public static int elevatorPositionTop = -2900; //High junction
+    public static int elevatorPositionMid = -2050; //Medium junction
+    public static int elevatorPositionLow = -1200; //Low junction
     public static int elevatorPositionBottom = -10;
     public int elevatorAcrossDrop = -2000;
 

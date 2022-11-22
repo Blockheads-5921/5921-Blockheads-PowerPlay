@@ -35,19 +35,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
-
+import com.qualcomm.robotcore.hardware.CRServo;
+import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 
 @Autonomous(name="Robot: PowerPlayAutonomousIntake", group="Robot")
 //@Disabled
 public class PowerPlayAutonomousIntake extends LinearOpMode {
 
     HardwareDrive robot = new HardwareDrive();
-
-    private ElapsedTime     runtime = new ElapsedTime();
-
-// Unused, delete later?
-//   static final double     FORWARD_SPEED = 0.6;
-//   static final double     TURN_SPEED    = 0.5;
+    private CRServo serv0;
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -66,52 +64,50 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         //VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
         //VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
 
-
         //PUT AUTONOMOUS SCRIPT HERE
 
-        CalibrateLifter(50);
-
-        /*
         //SCRIPT FOR STARTING AT A2 or F5
-        double autoPower = 0.12;
+        double autoPower = 0.30;
         int sleepTime = 1000;
-        SpinLeft(920,autoPower); //face towards cones
+        Drive("Normal",3,autoPower); //Center robot
+        Drive("Rotate",-90,autoPower); //face towards cones
         DriveStop(0);
-        sleep(sleepTime);
-        DriveForward(1048,autoPower); //move robot to pad A3, we're basing all operations on row 3
+        Drive("Normal",24,autoPower); //move robot to pad A3, we're basing all operations on row 3
         DriveStop(0);
-        sleep(sleepTime);
-        for (int i=1; i<4; i++){ //repeat 5 times; 5 is arbitrary, adjust depending on how fast the robot is
-            //PickUpCone(); //pick up cone
-            StrafeRight(1571,autoPower); //move to high pole
+        for (int i=1; i<3; i++){ //repeat an arbitrary number of times, adjust depending on how fast the robot is
+            serv0.setPower(0.22); //Grab cone
+            Drive("Strafe",36,autoPower); //move to high pole
             DriveStop(0);
-            sleep(sleepTime);
-            //DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1571,autoPower); //strafe back to cone area
+            DepositCone(3); //drop cone on high pole (height 3)
+            Drive("Strafe",-36,autoPower); //strafe back to cone area
             DriveStop(0);
-            sleep(sleepTime);
         }
         DriveReverse(2095,autoPower); //go to our terminal
         DriveStop(0);
-        */
-        */
-
-        /*SCRIPT FOR STARTING AT A5 or F2
-        SpinRight(290,100); //face towards cones
-        DriveForward(1048,100); //move robot to pad F3, we're basing all operations on row 3
-        for (int i=0; i<5; i++){ //5 is arbitary, adjust depending on how fast the robot is
-            PickUpCone(); //pick up cone
-            StrafeLeft(1571,100); //move to high pole
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeRight(1571,100); //strafe back to cone area
-        }
-        DriveReverse(2095,100); //go to our terminal Trentan made this
-         */
 
     }
 
-    // StrafeRight Function
-    private void StrafeRight(int straferight_encoder_pulses, double drive_power) {
+    //Move function
+    private void Drive(String movement_type, int inches_or_degrees, double drive_power) {
+        //Moves the robot in the specified movement type. Positive Normal drives forwards, 
+        //positive Strafe drives left, and positive Rotate spins the robot clockwise.
+
+        int[] motorDirCoefs = {0,0,0,0}
+        switch(movement_type) {
+            case "Normal":
+                motorDirCoefs = {-1,1,-1,1};
+                int encoder_pulses = 43.651*inches_or_degrees;
+                break;
+            case "Strafe":
+                motorDirCoefs = {-1,-1,1,1};
+                int encoder_pulses = 49.549*inches_or_degrees;
+                break;
+            case "Rotate":
+                motorDirCoefs = {-1,-1,-1,-1};
+                int encoder_pulses = 10.222*inches_or_degrees;
+                break;
+            
+        }
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -122,10 +118,10 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        robot.lf.setTargetPosition(-straferight_encoder_pulses);
-        robot.rf.setTargetPosition(-straferight_encoder_pulses);
-        robot.lb.setTargetPosition(straferight_encoder_pulses);
-        robot.rb.setTargetPosition(straferight_encoder_pulses);
+        robot.lf.setTargetPosition(encoder_pulses*motorDirCoefs[0]);
+        robot.lb.setTargetPosition(encoder_pulses*motorDirCoefs[1]);
+        robot.rf.setTargetPosition(encoder_pulses*motorDirCoefs[2]);
+        robot.rb.setTargetPosition(encoder_pulses*motorDirCoefs[3]);
 
         robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -136,245 +132,38 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.rf.setPower(drive_power);
         robot.lb.setPower(drive_power);
         robot.rb.setPower(drive_power);
-
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", straferight_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("StrafeRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
     }
 
-    // StrafeLeft Function
-    private void StrafeLeft(int stafeleft_encoder_pulses, double drive_power) {
 
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(stafeleft_encoder_pulses);
-        robot.rf.setTargetPosition(stafeleft_encoder_pulses);
-        robot.lb.setTargetPosition(-stafeleft_encoder_pulses);
-        robot.rb.setTargetPosition(-stafeleft_encoder_pulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        robot.lf.setPower(drive_power);
-        robot.rf.setPower(drive_power);
-        robot.lb.setPower(drive_power);
-        robot.rb.setPower(drive_power);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", stafeleft_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("StrafeLeft: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    // SpinLeft Function
-    private void SpinLeft(int spinleft_encoder_pulses, double drive_power) {
-
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(spinleft_encoder_pulses);
-        robot.rf.setTargetPosition(spinleft_encoder_pulses);
-        robot.lb.setTargetPosition(spinleft_encoder_pulses);
-        robot.rb.setTargetPosition(spinleft_encoder_pulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        robot.lf.setPower(drive_power);
-        robot.rf.setPower(drive_power);
-        robot.lb.setPower(drive_power);
-        robot.rb.setPower(drive_power);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", spinleft_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("SpinLeft: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    // SpinRight Function
-    private void SpinRight(int spinright_encoder_pulses, double drive_power) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-spinright_encoder_pulses);
-        robot.rf.setTargetPosition(-spinright_encoder_pulses);
-        robot.lb.setTargetPosition(-spinright_encoder_pulses);
-        robot.rb.setTargetPosition(-spinright_encoder_pulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drive_power);
-        robot.rf.setPower(drive_power);
-        robot.lb.setPower(drive_power);
-        robot.rb.setPower(drive_power);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", spinright_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("SpinRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    // DriveForward Function
-    private void DriveForward(int forward_encoder_pulses, double drive_power) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-forward_encoder_pulses);
-        robot.rf.setTargetPosition(+forward_encoder_pulses);
-        robot.lb.setTargetPosition(-forward_encoder_pulses);
-        robot.rb.setTargetPosition(+forward_encoder_pulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drive_power);
-        robot.rf.setPower(drive_power);
-        robot.lb.setPower(drive_power);
-        robot.rb.setPower(drive_power);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", forward_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("Forward: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    // DriveReverse Function
-    private void DriveReverse(int reverse_encoder_pulses, double drive_power){
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(reverse_encoder_pulses);
-        robot.rf.setTargetPosition(-reverse_encoder_pulses);
-        robot.lb.setTargetPosition(reverse_encoder_pulses);
-        robot.rb.setTargetPosition(-reverse_encoder_pulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drive_power);
-        robot.rf.setPower(drive_power);
-        robot.lb.setPower(drive_power);
-        robot.rb.setPower(drive_power);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", reverse_encoder_pulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void CalibrateLifter(int numberClicks){
-        robot.lift.setTargetPosition(numberClicks);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.5);
-    }
     // Lifter function
     private void DepositCone(int junctionLevel){
-        //assumes lift is at bottom and claw is closed
+        //assumes lift is at bottom
         switch (junctionLevel) {
             case 1:
-                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
+                targetPos = Constants.elevatorPositionLow;
                 break;
             case 2:
-                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
+                targetPos = Constants.elevatorPositionMid;
                 break;
             case 3:
-                targetPos = null; // and this would be still higher
+                targetPos = Constants.elevatorPositionTop;
                 break;
         }
         //raise arm
-        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
+        robot.lift.setTargetPosition(targetPos);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.35);
-
-        while (opModeIsActive() && (robot.lift.isBusy())) {
-            telemetry.addData("Lifter lifting...");
-        }
-
-        //release cone
-        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
-        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.gripper.setPower(0.35);
+        //Drive forwards and drop cone
+        Drive("Normal",4,0.35);
+        serv0.setPower(-0.1);
+        Drive("Normal",-4,0.35);
 
         //lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.35);
     }
 
-    //Pick up cone function
-    private void PickUpCone(){
-        //assumes gripper is open and arm is down; should be this way
-        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
-        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.gripper.setPower(0.35);
-    }
 
 // DriveStop Function
     private void DriveStop(double i) {
