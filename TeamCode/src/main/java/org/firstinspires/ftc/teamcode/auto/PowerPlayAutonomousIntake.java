@@ -43,9 +43,11 @@ import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 //@Disabled
 public class PowerPlayAutonomousIntake extends LinearOpMode {
 
+    Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
     private CRServo serv0;
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime
+    runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -69,18 +71,24 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
 
         //SCRIPT FOR STARTING AT A2 or F5
         double autoPower = 0.30;
-        int sleepTime = 1000;
+        int sleepTime = 1500;
         Drive("Normal",3,autoPower); //Center robot
-        Drive("Rotate",-90,autoPower); //face towards cones
+        sleep(sleepTime);
+        DriveStop(0);
+        Drive("Rotate",-1,autoPower); //face towards cones
+        sleep(sleepTime);
         DriveStop(0);
         Drive("Normal",24,autoPower); //move robot to pad A3, we're basing all operations on row 3
+        sleep(sleepTime);
         DriveStop(0);
         for (int i=1; i<3; i++){ //repeat an arbitrary number of times, adjust depending on how fast the robot is
             serv0.setPower(0.22); //Grab cone
             Drive("Strafe",36,autoPower); //move to high pole
             DriveStop(0);
+            sleep(sleepTime);
             DepositCone(3); //drop cone on high pole (height 3)
             Drive("Strafe",-36,autoPower); //strafe back to cone area
+            sleep(sleepTime);
             DriveStop(0);
         }
         Drive("Normal",-48,autoPower); //go to our terminal
@@ -89,7 +97,7 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
     }
 
     //Move function
-    private void Drive(String movement_type, int inches_or_degrees, double drive_power) {
+    private void Drive(String movement_type, int inches_or_right_angles, double drive_power) {
         //Moves the robot in the specified movement type. Positive Normal drives forwards, 
         //positive Strafe drives left, and positive Rotate spins the robot clockwise.
         int[] motorDirCoefs = {0,0,0,0};
@@ -97,15 +105,15 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         switch(movement_type) {
             case "Normal":
                 motorDirCoefs = new int[] {-1, 1, -1, 1};
-                encoder_pulses = 44*inches_or_degrees;
+                encoder_pulses = 44*inches_or_right_angles;
                 break;
             case "Strafe":
-                motorDirCoefs = new int[] {-1,-1,1,1};
-                encoder_pulses = 50*inches_or_degrees;
+                motorDirCoefs = new int[] {1,1,1,1};
+                encoder_pulses = 50*inches_or_right_angles;
                 break;
             case "Rotate":
                 motorDirCoefs = new int[]{-1,-1,-1,-1};
-                encoder_pulses = 10*inches_or_degrees;
+                encoder_pulses = 920*inches_or_right_angles;
                 break;
             
         }
@@ -156,10 +164,9 @@ public class PowerPlayAutonomousIntake extends LinearOpMode {
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.35);
         //Drive forwards and drop cone
-        Drive("Normal",4,0.35);
+        Drive("Normal",2,0.35);
         serv0.setPower(-0.1);
-        Drive("Normal",-4,0.35);
-
+        Drive("Normal",-2,0.35);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
