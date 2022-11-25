@@ -39,6 +39,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Constants;
 
+import java.util.Set;
+
 
 @Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
 //@Disabled
@@ -71,29 +73,30 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT A2 or F5
-        double autoPower = 0.20;
-        int sleepTime = 1000;
-        DriveForward(100,autoPower);
+        double autoPower = 0.40;
+        int sleepTime = 1;
+        DriveForward(200,autoPower);
         sleep(sleepTime);
-        serv0.setPower(0.22);
+        serv0.setPower(-0.1);
         SpinLeft(920,autoPower); //face towards cones
-        DriveStop(0);
         sleep(sleepTime);
-        DriveForward(1048,autoPower); //move robot to pad A3, we're basing all operations on row 3
-        DriveStop(0);
+        SetBrakes(true);
+        DriveForward(950,autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
-        for (int i=1; i<4; i++){ //repeat 5 times; 5 is arbitrary, adjust depending on how fast the robot is
-            serv0.setPower(0.22);
-            StrafeRight(1571,autoPower); //move to high pole
-            DriveStop(0);
+        SetBrakes(true);
+         for (int i=0; i<2; i++){ //repeat 5 times; 5 is arbitrary, adjust depending on how fast the robot is
+            serv0.setPower(-0.1); //grab cone
+            StrafeRight(1800,autoPower); //move to high pole
             sleep(sleepTime);
+            SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1571,autoPower); //strafe back to cone area
-            DriveStop(0);
+            StrafeLeft(1800,autoPower); //strafe back to cone area
             sleep(sleepTime);
+            SetBrakes(true);
         }
         DriveReverse(2095,autoPower); //go to our terminal
-        DriveStop(0);
+        sleep(sleepTime);
+        SetBrakes(true);
 
         /*SCRIPT FOR STARTING AT A5 or F2
         SpinRight(290,100); //face towards cones
@@ -109,18 +112,18 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
 
     }
 
-    private void DriveStop(double i) {
-        if (i == 0){
+    private void SetBrakes(boolean brakesOn) {
+        if (brakesOn){
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
         else{
-            robot.lf.setPower(i);
-            robot.rf.setPower(i);
-            robot.lb.setPower(i);
-            robot.rb.setPower(i);
+            robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
     }
 
@@ -328,50 +331,6 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         }
     }
 
-/*
-    // Lifter function
-    private void DepositCone(junctionLevel){
-        //assumes lift is at bottom and claw is closed
-        switch (junctionLevel) {
-            case 1:
-                targetPos = null; //fill these out, they're for how high to raise the lift. IDK the values myself.
-                break;
-            case 2:
-                targetPos = null; //so for example this value for targetPos would cause the elevator to go higher than the previous
-                break;
-            case 3:
-                targetPos = null; // and this would be still higher
-                break;
-        }
-        //raise arm
-        robot.lift.setTargetPosition(targetPos); //does not work now because targetPos is null
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.35);
-
-        while (opModeIsActive() && (robot.lift.isBusy())) {
-            telemetry.addData("Lifter lifting...");
-        }
-
-        //release cone
-        robot.gripper.setTargetPosition(openPosition); //this is a placeholder
-        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.gripper.setPower(0.35);
-
-        //lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION); //might need changing?
-        robot.lift.setPower(0.35);
-    }
-
-    //Pick up cone function
-    private void PickUpCone(){
-        //assumes gripper is open and arm is down; should be this way
-        robot.gripper.setTargetPosition(closedPosition); //this is a placeholder
-        robot.gripper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.gripper.setPower(0.35);
-    }
-    */
-
     private void DepositCone(int junctionLevel){
         //assumes lift is at bottom
         int targetPos = 0;
@@ -386,22 +345,28 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
                 targetPos = Constants.elevatorPositionTop;
                 break;
         }
+        //Give time for less rocking
+        sleep(200);
         //raise arm
         robot.lift.setTargetPosition(targetPos);
+        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
-        sleep(1000);
+        sleep(2250);
+        robot.lift.setPower(0);
         //Drive forwards and drop cone
-        //DriveForward(100,35);
-        //sleep(750);
-        serv0.setPower(-0.1);
-        //DriveReverse(100,35);
-        //sleep(750);
+        DriveForward(200,5);
+        SetBrakes(false);
+        serv0.setPower(0.20);
+        sleep(500);
+        DriveReverse(200,15);
+        SetBrakes(true);
+        sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.1);
-        sleep(500);
+        robot.lift.setPower(0.75);
+        sleep(1500);
     }
 }
 
