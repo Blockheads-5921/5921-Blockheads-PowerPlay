@@ -164,7 +164,7 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
     }
 
     double DriveTrainSpeed() {
-        double drivePower = 1;
+        double drivePower = 0.25;
 
         if (gamepad1.right_bumper)
             drivePower = 1;

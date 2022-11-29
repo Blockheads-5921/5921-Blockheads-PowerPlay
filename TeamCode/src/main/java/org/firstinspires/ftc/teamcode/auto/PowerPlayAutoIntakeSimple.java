@@ -81,18 +81,24 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         SpinLeft(920,autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        DriveForward(950,autoPower); //move robot to pad A3, we're basing all operations on row 3
+        DriveForward(1050,autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
-         for (int i=0; i<2; i++){ //repeat 5 times; 5 is arbitrary, adjust depending on how fast the robot is
+        for (int i=0; i<2; i++){ //go back and forth between coney triangle and high junction
+            DriveForward(300,autoPower);
+            sleep(sleepTime);
+            SetBrakes(true);
             serv0.setPower(-0.1); //grab cone
-            StrafeRight(1800,autoPower); //move to high pole
+            DriveReverse(350,autoPower);
+            sleep(sleepTime);
+            StrafeRight(1700,autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1800,autoPower); //strafe back to cone area
+            StrafeLeft(1700,autoPower); //strafe back to cone area
             sleep(sleepTime);
             SetBrakes(true);
+            DriveForward(150, autoPower);
         }
         DriveReverse(2095,autoPower); //go to our terminal
         sleep(sleepTime);
@@ -351,16 +357,16 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         robot.lift.setTargetPosition(targetPos);
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.75);
+        robot.lift.setPower(1.00);
         sleep(2250);
         robot.lift.setPower(0);
         //Drive forwards and drop cone
-        DriveForward(200,5);
         SetBrakes(false);
+        DriveForward(200,0.15);
         serv0.setPower(0.20);
-        sleep(500);
-        DriveReverse(200,15);
         SetBrakes(true);
+        sleep(500);
+        DriveReverse(200,0.7);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
@@ -369,4 +375,3 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         sleep(1500);
     }
 }
-
