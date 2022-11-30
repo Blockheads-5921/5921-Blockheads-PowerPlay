@@ -113,8 +113,8 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
  //       robot.lift.setPower((directionL) * 0.35);
 
  // trying to prevent the lift from stalling at the top, see if statement below
-        if (robot.lift.getCurrentPosition() > -2900){
-        robot.lift.setPower((directionL) * 0.40);}
+        if (robot.lift.getCurrentPosition() > -2950){ //can replace this with Constants.elevatorPositionTop
+            robot.lift.setPower((directionL) * 0.40);}
         else {
             robot.lift.setPower((directionL) * 0.01);}
 
@@ -164,7 +164,7 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
     }
 
     double DriveTrainSpeed() {
-        double drivePower = 1;
+        double drivePower = 0.25;
 
         if (gamepad1.right_bumper)
             drivePower = 1;
