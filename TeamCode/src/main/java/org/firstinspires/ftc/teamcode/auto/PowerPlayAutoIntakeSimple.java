@@ -72,7 +72,7 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
 
         // PUT AUTONOMOUS SCRIPT HERE
 
-        // SCRIPT FOR STARTING AT A2 or F5
+        // SCRIPT FOR STARTING AT A2
         double autoPower = 0.40;
         int sleepTime = 1;
         serv0.setPower(-0.1);
@@ -85,7 +85,7 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         DriveForward(1050,autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i=0; i<2; i++){ //go back and forth between coney triangle and high junction
+        for (int i=0; i<2; i++){ //go back and forth between substation and high junction
             StrafeRight(1700,autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
@@ -96,7 +96,8 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
             DriveForward(350,autoPower); //Go forward to pick up cone.
             sleep(sleepTime);
             SetBrakes(true);
-            serv0.setPower(-0.1);
+            serv0.setPower(-0.1); //Pick up cone
+            sleep(200);
             DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
             sleep(sleepTime);
             SetBrakes(true);
@@ -105,18 +106,6 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         DriveReverse(2095,autoPower); //go to our terminal
         sleep(sleepTime);
         SetBrakes(true);
-
-        /*SCRIPT FOR STARTING AT A5 or F2
-        SpinRight(290,100); //face towards cones
-        DriveForward(1048,100); //move robot to pad F3, we're basing all operations on row 3
-        for (int i=0; i<5; i++){ //5 is arbitary, adjust depending on how fast the robot is
-            PickUpCone(); //pick up cone
-            StrafeLeft(1571,100); //move to high pole
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeRight(1571,100); //strafe back to cone area
-        }
-        DriveReverse(2095,100); //go to our terminal Trentan made this
-         */
 
     }
 
@@ -353,27 +342,30 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
                 targetPos = Constants.elevatorPositionTop;
                 break;
         }
-        //Give time for less rocking
-        sleep(200);
         //raise arm
         robot.lift.setTargetPosition(targetPos);
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(2250);
-        robot.lift.setPower(0);
-        //Drive forwards and drop cone
+        sleep(1500);
+        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
+        //Drive forward
         SetBrakes(false);
-        DriveForward(200,0.15);
-        serv0.setPower(0.20);
-        SetBrakes(true);
-        sleep(500);
+        DriveForward(200,0.15); 
+        //Lower arm
+        robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(7.5);
+        //Release cone
+        serv0.setPower(0.20); 
+        //Back up
         DriveReverse(200,0.7);
         sleep(250);
-        //lower arm
+        //lower arm fully
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
-        sleep(1500);
+        sleep(1550);
+        SetBrakes(true);
     }
 }
