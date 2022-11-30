@@ -75,9 +75,10 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         // SCRIPT FOR STARTING AT A2 or F5
         double autoPower = 0.40;
         int sleepTime = 1;
+        serv0.setPower(-0.1);
+        sleep(sleepTime);
         DriveForward(200,autoPower);
         sleep(sleepTime);
-        serv0.setPower(-0.1);
         SpinLeft(920,autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
@@ -85,20 +86,21 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         sleep(sleepTime);
         SetBrakes(true);
         for (int i=0; i<2; i++){ //go back and forth between coney triangle and high junction
-            DriveForward(300,autoPower);
-            sleep(sleepTime);
-            SetBrakes(true);
-            serv0.setPower(-0.1); //grab cone
-            DriveReverse(350,autoPower);
-            sleep(sleepTime);
             StrafeRight(1700,autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1700,autoPower); //strafe back to cone area
+            StrafeLeft(1700,autoPower); // Strafe back to A3
             sleep(sleepTime);
             SetBrakes(true);
-            DriveForward(150, autoPower);
+            DriveForward(350,autoPower); //Go forward to pick up cone.
+            sleep(sleepTime);
+            SetBrakes(true);
+            serv0.setPower(-0.1);
+            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
+            sleep(sleepTime);
+            SetBrakes(true);
+            sleep(200);
         }
         DriveReverse(2095,autoPower); //go to our terminal
         sleep(sleepTime);
