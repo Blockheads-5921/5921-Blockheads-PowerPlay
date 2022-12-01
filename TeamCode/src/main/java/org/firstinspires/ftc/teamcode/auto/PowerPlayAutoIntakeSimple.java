@@ -30,29 +30,25 @@
 package org.firstinspires.ftc.teamcode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.teamcode.common.AutoMethods;
 
-import java.util.Set;
 
 @Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
 public class PowerPlayAutoIntakeSimple extends LinearOpMode {
 
-    Constants constants = new Constants();
-    HardwareDrive robot = new HardwareDrive();
-    private CRServo serv0;
+    private final HardwareDrive robot = new HardwareDrive();
     private final ElapsedTime
     runtime = new ElapsedTime();
+    private final AutoMethods auto = new AutoMethods();
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
-        serv0 = hardwareMap.get(CRServo.class, "serv0");
+        CRServo serv0 = hardwareMap.get(CRServo.class, "serv0");
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
@@ -74,296 +70,35 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         int sleepTime = 1;
         serv0.setPower(-0.1);
         sleep(sleepTime);
-        DriveForward(200, autoPower);
+        auto.DriveForward(200, autoPower);
         sleep(sleepTime);
-        SpinLeft(920, autoPower); //face towards cones
+        auto.SpinLeft(920, autoPower); //face towards cones
         sleep(sleepTime);
-        SetBrakes(true);
-        DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
+        auto.SetBrakes(true);
+        auto.DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
-        SetBrakes(true);
+        auto.SetBrakes(true);
         for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            StrafeRight(1700, autoPower); //move to high pole
+            auto.StrafeRight(1700, autoPower); //move to high pole
             sleep(sleepTime);
-            SetBrakes(true);
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1700, autoPower); // Strafe back to A3
+            auto.SetBrakes(true);
+            auto.DepositCone(3, serv0); //drop cone on high pole (height 3)
+            auto.StrafeLeft(1700, autoPower); // Strafe back to A3
             sleep(sleepTime);
-            SetBrakes(true);
-            DriveForward(350, autoPower); //Go forward to pick up cone.
+            auto.SetBrakes(true);
+            auto.DriveForward(350, autoPower); //Go forward to pick up cone.
             sleep(sleepTime);
-            SetBrakes(true);
+            auto.SetBrakes(true);
             serv0.setPower(-0.1); //Pick up cone
             sleep(500);
-            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
+            auto.DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
             sleep(sleepTime);
-            SetBrakes(true);
+            auto.SetBrakes(true);
             sleep(200);
         }
-        DriveReverse(2095, autoPower); //go to our terminal
+        auto.DriveReverse(2095, autoPower); //go to our terminal
         sleep(sleepTime);
-        SetBrakes(true);
+        auto.SetBrakes(true);
 
-    }
-
-    private void SetBrakes(boolean brakesOn) {
-        if (brakesOn){
-            robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
-        else{
-            robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        }
-    }
-
-    private void StrafeRight(int straferightEncoderPulses, double drivePower) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-straferightEncoderPulses);
-        robot.rf.setTargetPosition(-straferightEncoderPulses);
-        robot.lb.setTargetPosition(straferightEncoderPulses);
-        robot.rb.setTargetPosition(straferightEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        // update the telemetry monitor
-        while (opModeIsActive() && (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", straferightEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("StrafeRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(strafeleftEncoderPulses);
-        robot.rf.setTargetPosition(strafeleftEncoderPulses);
-        robot.lb.setTargetPosition(-strafeleftEncoderPulses);
-        robot.rb.setTargetPosition(-strafeleftEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", strafeleftEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("StrafeLeft: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
-
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(spinleftEncoderPulses);
-        robot.rf.setTargetPosition(spinleftEncoderPulses);
-        robot.lb.setTargetPosition(spinleftEncoderPulses);
-        robot.rb.setTargetPosition(spinleftEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", spinleftEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("SpinLeft: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void SpinRight(int spinrightEncoderPulses, double drivePower) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-spinrightEncoderPulses);
-        robot.rf.setTargetPosition(-spinrightEncoderPulses);
-        robot.lb.setTargetPosition(-spinrightEncoderPulses);
-        robot.rb.setTargetPosition(-spinrightEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", spinrightEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("SpinRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void DriveForward(int forwardEncoderPulses, double drivePower) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-forwardEncoderPulses);
-        robot.rf.setTargetPosition(+forwardEncoderPulses);
-        robot.lb.setTargetPosition(-forwardEncoderPulses);
-        robot.rb.setTargetPosition(+forwardEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", forwardEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("Forward: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void DriveReverse(int reverseEncoderPulses, double drivePower){
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(reverseEncoderPulses);
-        robot.rf.setTargetPosition(-reverseEncoderPulses);
-        robot.lb.setTargetPosition(reverseEncoderPulses);
-        robot.rb.setTargetPosition(-reverseEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", reverseEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void DepositCone(int junctionLevel){
-        //assumes lift is at bottom
-        int targetPos = 0;
-        switch (junctionLevel) {
-            case 1:
-                targetPos = Constants.elevatorPositionLow;
-                break;
-            case 2:
-                targetPos = Constants.elevatorPositionMid;
-                break;
-            case 3:
-                targetPos = Constants.elevatorPositionTop;
-                break;
-        }
-        //raise arm
-        robot.lift.setTargetPosition(targetPos);
-        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(1.00);
-        sleep(2200);
-        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
-        //Drive forward
-        SetBrakes(false);
-        DriveForward(160,0.15);
-        //Lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.66);
-        sleep(1500);
-        //Release cone
-        serv0.setPower(0.18);
-        //Back up
-        DriveReverse(160,0.7);
-        sleep(250);
-        //lower arm fully
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.75);
-        sleep(750);
-        SetBrakes(true);
     }
 }
