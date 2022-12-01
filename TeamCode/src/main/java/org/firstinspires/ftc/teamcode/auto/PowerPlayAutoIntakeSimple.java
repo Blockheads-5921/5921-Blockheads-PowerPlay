@@ -28,7 +28,6 @@
  */
 
 package org.firstinspires.ftc.teamcode.auto;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -41,9 +40,7 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 
 import java.util.Set;
 
-
 @Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
-//@Disabled
 public class PowerPlayAutoIntakeSimple extends LinearOpMode {
 
     Constants constants = new Constants();
