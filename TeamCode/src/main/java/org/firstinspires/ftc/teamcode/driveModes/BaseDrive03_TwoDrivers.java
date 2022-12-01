@@ -58,7 +58,6 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
     private void UpdatePlayer1() {
         double drivePower = DriveTrainSpeed();
         DriveTrainBase(drivePower);
-        DriveTrainSpeed();
         DriveMicroAdjust(0.4);
     }
 

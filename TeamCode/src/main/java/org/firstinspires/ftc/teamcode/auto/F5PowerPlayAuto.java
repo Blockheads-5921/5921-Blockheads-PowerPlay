@@ -103,10 +103,10 @@ public class F5PowerPlayAuto extends LinearOpMode {
             SetBrakes(true);
             sleep(200);
         }
-        DriveForward(200); //Park in substation
+        DriveForward(200, autoPower); //Park in substation
         sleep(sleepTime);
         SetBrakes(true);
-        StrafeLeft(150);
+        StrafeLeft(150, autoPower);
         sleep(sleepTime);
         SetBrakes(true);
 
