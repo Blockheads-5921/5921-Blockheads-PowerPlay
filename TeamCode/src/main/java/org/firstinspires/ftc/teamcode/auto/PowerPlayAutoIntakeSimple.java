@@ -78,25 +78,26 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         auto.DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
         auto.SetBrakes(true);
-        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            auto.StrafeRight(1700, autoPower); //move to high pole
+        // go back and forth between substation and high junction
+        for (int i = 0; i < 2; i++) {
+            auto.StrafeRight(1700, autoPower); // move to high pole
             sleep(sleepTime);
             auto.SetBrakes(true);
-            auto.DepositCone(3, serv0); //drop cone on high pole (height 3)
-            auto.StrafeLeft(1700, autoPower); // Strafe back to A3
+            auto.DepositCone(3, serv0); // drop cone on high pole (height 3)
+            auto.StrafeLeft(1700, autoPower); // strafe back to A3
             sleep(sleepTime);
             auto.SetBrakes(true);
-            auto.DriveForward(350, autoPower); //Go forward to pick up cone.
+            auto.DriveForward(350, autoPower); // Go forward to pick up cone.
             sleep(sleepTime);
             auto.SetBrakes(true);
             serv0.setPower(-0.1); //Pick up cone
             sleep(500);
-            auto.DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
+            auto.DriveReverse(350, autoPower); // Go back after picking up cone. We're now centered at A3 again.
             sleep(sleepTime);
             auto.SetBrakes(true);
             sleep(200);
         }
-        auto.DriveReverse(2095, autoPower); //go to our terminal
+        auto.DriveReverse(2095, autoPower); // go to our terminal
         sleep(sleepTime);
         auto.SetBrakes(true);
 
