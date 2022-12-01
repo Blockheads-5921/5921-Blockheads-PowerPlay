@@ -28,11 +28,7 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
 
     private boolean toggleButton = true;
 
-    /**
-     * The relativeLayout field is used to aid in providing interesting visual feedback
-     * in this sample application; you probably *don't* need this when you use a color sensor on your
-     * robot. Note that you won't see anything change on the Driver Station, only on the Robot Controller.
-     */
+    //might not need View relativelayout;, according to code this was built off of.
     View relativeLayout;
 
     @Override
@@ -55,7 +51,6 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
     private void loop1() {
         UpdateButton();
         UpdatePlayer1();
-        UpdatePlayer2();
         UpdateTelemetry();
 
             }
@@ -63,18 +58,7 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
     private void UpdatePlayer1() {
         double drivePower = DriveTrainSpeed();
         DriveTrainBase(drivePower);
-        DriveTrainSpeed();
         DriveMicroAdjust(0.4);
-    }
-
-    private void UpdatePlayer2() {
-
-//      Currently using manual lifter for Player2, debug Lifter(), then uncomment Lifter() below.
-//      Lifter() function, currently is not advised, -commented out below
-//      Using .power approach vs. .encoder values
-//        Lifter();
-
-
     }
 
     private void UpdateTelemetry() {
@@ -103,27 +87,25 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
         double directionX = Math.pow(gamepad1.left_stick_x, 1); //Strafe
         double directionY = Math.pow(gamepad1.left_stick_y, 1); //Forward
         double directionR = -Math.pow(gamepad1.right_stick_x, 1); //Turn
-        double directionL = Math.pow(gamepad2.right_stick_y, 1); //Lift
+        double liftPower = Math.pow(gamepad2.right_stick_y, 1); //Lift
+        int liftPos = robot.lift.getCurrentPosition();
 
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
         robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
         robot.lb.setPower((directionY + directionR + directionX) * drivePower);
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
- //       robot.lift.setPower((directionL) * 0.35);
 
- // trying to prevent the lift from stalling at the top, see if statement below
-        if (robot.lift.getCurrentPosition() > -2950){ //can replace this with Constants.elevatorPositionTop
-            robot.lift.setPower((directionL) * 0.40);}
-        else {
-            robot.lift.setPower((directionL) * 0.01);}
+        if (liftPos < Constants.elevatorPositionTop) {
+            // Make sure we're not letting lift over-extend...
+            robot.lift.setPower((liftPower) * 0.1);
+        } else if (liftPos > Constants.elevatorPositionBottom) {
+            // or over-retract.
+            robot.lift.setPower((liftPower) * 0.01);
+        } else {
+            robot.lift.setPower((liftPower) * 0.60);
+        }
 
-//        if (gamepad2.right_stick_y > -0.75) {
-//            robot.lift.setPower((directionL) * 0.05); // give lift some constant power to prevent fast drops
-//        }
-//        else if (gamepad2.right_stick_y > -0.5) {
-//            robot.lift.setPower((directionL) * 0.01); // give lift some constant power to prevent fast drops
-//        }
     }
 
 
@@ -172,58 +154,6 @@ public class BaseDrive03_TwoDrivers extends LinearOpMode {
             drivePower = 0.25;
 
         return drivePower;
-    }
-
-    // uncomment start
-    // rebuild all of Lifter function, currently just using manual mode above, in drivetrain
-    private void Lifter() {
-        int position = robot.lift.getCurrentPosition();
-        if (lifterButton.is(Button.State.TAP)) {
-             if (position >= (Constants.elevatorPositionTop + 20)) {
-                robot.lift.setTargetPosition(Constants.elevatorPositionDown - 20);
-                robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.lift.setPower(0.35);
-                while (opModeIsActive() &&
-                        // (runtime.seconds() < timeoutS) &&
-                        (robot.lift.isBusy())) {
-
-                    // Display it for the driver.
-                    telemetry.addData("Running to", " %7d ", Constants.elevatorPositionDown - 50);
-                    telemetry.addData("Currently at", " at %7d", robot.lift.getCurrentPosition());
-                    telemetry.update();
-                }
-
-
-            } else {
-                robot.lift.setTargetPosition(Constants.elevatorPositionTop);
-                robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.lift.setPower(0.35);
-            }
-        }
-
-        if (lifterBottomButton.is(Button.State.TAP)) {
-            if (position >= (Constants.elevatorPositionBottom + 400)) {
-                robot.lift.setTargetPosition(Constants.elevatorPositionDown + 390);
-                robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.lift.setPower(0.3);
-            } else {
-                robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-                robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.lift.setPower(0.3);
-            }
-        }
-
-        // next two if statements, Code below is very buggy, delete and rebuild
-//        if (gamepad2.left_bumper) {
-//            robot.lift.setTargetPosition(position + 50);
-//            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.lift.setPower(0.35);
-//        }
-//        if (gamepad2.right_bumper) {
-//            robot.lift.setTargetPosition(position - 50);
-//            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.lift.setPower(0.35);
-//        }
     }
 
 }
