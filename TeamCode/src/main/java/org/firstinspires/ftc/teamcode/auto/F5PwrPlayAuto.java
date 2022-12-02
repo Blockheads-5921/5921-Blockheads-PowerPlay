@@ -35,19 +35,15 @@ import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.AutoMethods;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.common.Constants;
 
 
+@Autonomous(name="Robot: F5PwrPlayAuto", group="Robot")
+public class F5PwrPlayAuto extends LinearOpMode {
 
-@Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
-public class PowerPlayAutoIntakeSimple extends LinearOpMode {
-
-    HardwareDrive robot = new HardwareDrive();
+    private final HardwareDrive robot = new HardwareDrive();
     private final ElapsedTime
     runtime = new ElapsedTime();
-    AutoMethods auto = new AutoMethods();
+    private final AutoMethods auto = new AutoMethods();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -100,8 +96,8 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
             auto.SetBrakes(true);
             sleep(200);
         }
-        auto.DriveReverse(2095, autoPower); //go to our terminal
-        sleep(sleepTime);
+        auto.DriveForward(300,autoPower);
+        sleep(3000);
         auto.SetBrakes(true);
 
     }

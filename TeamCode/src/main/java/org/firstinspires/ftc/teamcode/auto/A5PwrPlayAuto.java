@@ -35,19 +35,15 @@ import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.AutoMethods;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.common.Constants;
 
 
+@Autonomous(name="Robot: A5PwrPlayAuto", group="Robot")
+public class A5PwrPlayAuto extends LinearOpMode {
 
-@Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
-public class PowerPlayAutoIntakeSimple extends LinearOpMode {
-
-    HardwareDrive robot = new HardwareDrive();
+    private final HardwareDrive robot = new HardwareDrive();
     private final ElapsedTime
     runtime = new ElapsedTime();
-    AutoMethods auto = new AutoMethods();
+    private final AutoMethods auto = new AutoMethods();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -76,18 +72,18 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         sleep(sleepTime);
         auto.DriveForward(200, autoPower);
         sleep(sleepTime);
-        auto.SpinLeft(920, autoPower); //face towards cones
+        auto.SpinRight(920, autoPower); //face towards cones
         sleep(sleepTime);
         auto.SetBrakes(true);
         auto.DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
         auto.SetBrakes(true);
         for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            auto.StrafeRight(1700, autoPower); //move to high pole
+            auto.StrafeLeft(1700, autoPower); //move to high pole
             sleep(sleepTime);
             auto.SetBrakes(true);
             auto.DepositCone(3, serv0); //drop cone on high pole (height 3)
-            auto.StrafeLeft(1700, autoPower); // Strafe back to A3
+            auto.StrafeRight(1700, autoPower); // Strafe back to A3
             sleep(sleepTime);
             auto.SetBrakes(true);
             auto.DriveForward(350, autoPower); //Go forward to pick up cone.
@@ -100,8 +96,8 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
             auto.SetBrakes(true);
             sleep(200);
         }
-        auto.DriveReverse(2095, autoPower); //go to our terminal
-        sleep(sleepTime);
+        auto.DriveForward(300,autoPower);
+        sleep(3000);
         auto.SetBrakes(true);
 
     }
