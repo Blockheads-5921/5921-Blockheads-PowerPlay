@@ -352,17 +352,12 @@ public class A2PowerPlayAuto extends LinearOpMode {
         //Drive forward
         SetBrakes(false);
         DriveForward(160,0.15);
-        //Lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.66);
-        sleep(1500);
         //Release cone
         serv0.setPower(0.18);
         //Back up
         DriveReverse(160,0.7);
         sleep(250);
-        //lower arm fully
+        //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
