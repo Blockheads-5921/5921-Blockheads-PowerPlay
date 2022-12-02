@@ -42,9 +42,9 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 import java.util.Set;
 
 
-@Autonomous(name="Robot: PowerPlayAutoIntakeSimple", group="Robot")
+@Autonomous(name="Robot: A5PowerPlayAuto", group="Robot")
 //@Disabled
-public class PowerPlayAutoIntakeSimple extends LinearOpMode {
+public class A5PowerPlayAuto extends LinearOpMode {
 
     Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
@@ -72,38 +72,41 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
 
         // PUT AUTONOMOUS SCRIPT HERE
 
-        // SCRIPT FOR STARTING AT A2
+        // SCRIPT FOR STARTING AT A5
         double autoPower = 0.40;
         int sleepTime = 1;
         serv0.setPower(-0.1);
         sleep(sleepTime);
         DriveForward(200, autoPower);
         sleep(sleepTime);
-        SpinLeft(920, autoPower); //face towards cones
+        SpinRight(920, autoPower); // face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
+        DriveForward(1050, autoPower); // move robot to pad A4, we're basing all operations on row 4
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            StrafeRight(1700, autoPower); //move to high pole
+        for (int i = 0; i < 2; i++) { // go back and forth between substation and high junction
+            StrafeLeft(1700, autoPower); // move to high pole
             sleep(sleepTime);
             SetBrakes(true);
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1700, autoPower); // Strafe back to A3
+            DepositCone(3); // drop cone on high pole (height 3)
+            StrafeRight(1700, autoPower); // Strafe back to A4
             sleep(sleepTime);
             SetBrakes(true);
-            DriveForward(350, autoPower); //Go forward to pick up cone.
+            DriveForward(350, autoPower); // Go forward to pick up cone.
             sleep(sleepTime);
             SetBrakes(true);
-            serv0.setPower(-0.1); //Pick up cone
-            sleep(500);
-            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
+            serv0.setPower(-0.1); // Pick up cone
+            sleep(200);
+            DriveReverse(350, autoPower); // Go back after picking up cone. We're now centered at A4 again.
             sleep(sleepTime);
             SetBrakes(true);
             sleep(200);
         }
-        DriveReverse(2095, autoPower); //go to our terminal
+        DriveForward(200, autoPower); //Park in substation
+        sleep(sleepTime);
+        SetBrakes(true);
+        StrafeRight(150, autoPower);
         sleep(sleepTime);
         SetBrakes(true);
 
@@ -347,26 +350,25 @@ public class PowerPlayAutoIntakeSimple extends LinearOpMode {
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(2200);
+        sleep(1500);
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(160,0.15);
+        DriveForward(200,0.15); 
         //Lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.66);
-        sleep(1500);
+        robot.lift.setPower(7.5);
         //Release cone
-        serv0.setPower(0.18);
+        serv0.setPower(0.20); 
         //Back up
-        DriveReverse(160,0.7);
+        DriveReverse(200,0.7);
         sleep(250);
         //lower arm fully
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
-        sleep(750);
+        sleep(1550);
         SetBrakes(true);
     }
 }
