@@ -77,36 +77,33 @@ public class F5PowerPlayAuto extends LinearOpMode {
         int sleepTime = 1;
         serv0.setPower(-0.1);
         sleep(sleepTime);
-        DriveForward(200,autoPower);
+        DriveForward(200, autoPower);
         sleep(sleepTime);
-        SpinLeft(920,autoPower); //face towards cones
-        sleep(sleepTime);
-        SetBrakes(true);
-        DriveForward(1050,autoPower); //move robot to pad F4, we're basing all operations on row 4
+        SpinLeft(920, autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i=0; i<2; i++){ //go back and forth between substation and high junction
-            StrafeRight(1700,autoPower); //move to high pole
+        DriveForward(1025, autoPower); //move robot to pad F4, we're basing all operations on row 4
+        sleep(sleepTime);
+        SetBrakes(true);
+        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
+            StrafeRight(1700, autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1700,autoPower); // Strafe back to F4
+            StrafeLeft(1700, autoPower); // Strafe back to F4
             sleep(sleepTime);
             SetBrakes(true);
-            DriveForward(350,autoPower); //Go forward to pick up cone.
+            DriveForward(350, autoPower); //Go forward to pick up cone.
             sleep(sleepTime);
             SetBrakes(true);
             serv0.setPower(-0.1); //Pick up cone
-            sleep(200);
+            sleep(500);
             DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at F4 again.
             sleep(sleepTime);
             SetBrakes(true);
             sleep(200);
         }
-        DriveForward(200, autoPower); //Park in substation
-        sleep(sleepTime);
-        SetBrakes(true);
-        StrafeLeft(150, autoPower);
+        DriveForward(300, autoPower); //go to our substation
         sleep(sleepTime);
         SetBrakes(true);
 
@@ -350,25 +347,26 @@ public class F5PowerPlayAuto extends LinearOpMode {
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(1500);
+        sleep(2200);
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(200,0.15); 
+        DriveForward(160,0.15);
         //Lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(7.5);
+        robot.lift.setPower(0.66);
+        sleep(1500);
         //Release cone
-        serv0.setPower(0.20); 
+        serv0.setPower(0.18);
         //Back up
-        DriveReverse(200,0.7);
+        DriveReverse(160,0.7);
         sleep(250);
         //lower arm fully
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
-        sleep(1550);
+        sleep(750);
         SetBrakes(true);
     }
 }

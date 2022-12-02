@@ -76,31 +76,31 @@ public class F2PowerPlayAuto extends LinearOpMode {
         sleep(sleepTime);
         DriveForward(200, autoPower);
         sleep(sleepTime);
-        SpinRight(920, autoPower); // face towards cones
+        SpinRight(920, autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        DriveForward(1050, autoPower); // move robot to pad F3, we're basing all operations on row 3
+        DriveForward(1025, autoPower); //move robot to pad F3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i = 0; i < 2; i++) { // go back and forth between substation and high junction
-            StrafeLeft(1700, autoPower); // move to high pole
+        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
+            StrafeLeft(1700, autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
-            DepositCone(3); // drop cone on high pole (height 3)
+            DepositCone(3); //drop cone on high pole (height 3)
             StrafeRight(1700, autoPower); // Strafe back to F3
             sleep(sleepTime);
             SetBrakes(true);
-            DriveForward(350, autoPower); // Go forward to pick up cone.
+            DriveForward(350, autoPower); //Go forward to pick up cone.
             sleep(sleepTime);
             SetBrakes(true);
-            serv0.setPower(-0.1); // Pick up cone
-            sleep(200);
-            DriveReverse(350, autoPower); // Go back after picking up cone. We're now centered at F3 again.
+            serv0.setPower(-0.1); //Pick up cone
+            sleep(500);
+            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at F3 again.
             sleep(sleepTime);
             SetBrakes(true);
             sleep(200);
         }
-        DriveReverse(2095, autoPower); // go to our terminal
+        DriveReverse(2095, autoPower); //go to our terminal
         sleep(sleepTime);
         SetBrakes(true);
 
@@ -330,8 +330,8 @@ public class F2PowerPlayAuto extends LinearOpMode {
         }
     }
 
-    private void DepositCone(int junctionLevel) {
-        // assumes lift is at bottom
+    private void DepositCone(int junctionLevel){
+        //assumes lift is at bottom
         int targetPos = 0;
         switch (junctionLevel) {
             case 1:
@@ -344,30 +344,31 @@ public class F2PowerPlayAuto extends LinearOpMode {
                 targetPos = Constants.elevatorPositionTop;
                 break;
         }
-        // raise arm
+        //raise arm
         robot.lift.setTargetPosition(targetPos);
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(1500);
-        robot.lift.setPower(0); // Brake arm, maybe unnecessary?
-        // Drive forward
+        sleep(2200);
+        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
+        //Drive forward
         SetBrakes(false);
-        DriveForward(200, 0.15);
-        // Lower arm
+        DriveForward(160,0.15);
+        //Lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(7.5);
-        // Release cone
-        serv0.setPower(0.20);
-        // Back up
-        DriveReverse(200, 0.7);
+        robot.lift.setPower(0.66);
+        sleep(1500);
+        //Release cone
+        serv0.setPower(0.18);
+        //Back up
+        DriveReverse(160,0.7);
         sleep(250);
-        // lower arm fully
+        //lower arm fully
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
-        sleep(1550);
+        sleep(750);
         SetBrakes(true);
     }
 }
