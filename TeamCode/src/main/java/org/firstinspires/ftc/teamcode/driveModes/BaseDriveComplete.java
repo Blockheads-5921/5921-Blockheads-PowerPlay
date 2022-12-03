@@ -73,9 +73,9 @@ public class BaseDriveComplete extends LinearOpMode {
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
 
         // Make sure we're not letting lift over-extend...
-        if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
+        if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.33);
         // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.01);
+        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.33);
         else robot.lift.setPower((liftPower) * 0.60);
 
     }
