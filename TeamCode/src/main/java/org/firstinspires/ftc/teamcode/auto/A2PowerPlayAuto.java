@@ -347,7 +347,7 @@ public class A2PowerPlayAuto extends LinearOpMode {
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(2200);
+        sleep(2300);
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
@@ -355,7 +355,7 @@ public class A2PowerPlayAuto extends LinearOpMode {
         //Release cone
         serv0.setPower(0.18);
         //Back up
-        DriveReverse(160,0.7);
+        DriveReverse(160,0.20);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);

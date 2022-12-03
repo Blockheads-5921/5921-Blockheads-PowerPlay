@@ -82,15 +82,15 @@ public class A5PowerPlayAuto extends LinearOpMode {
         SpinRight(920, autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        DriveForward(1025, autoPower); //move robot to pad A4, we're basing all operations on row 3
+        DriveForward(975, autoPower); //move robot to pad A4, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
         for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            StrafeLeft(1700, autoPower); //move to high pole
+            StrafeLeft(1750, autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
-            StrafeRight(1700, autoPower); // Strafe back to A4
+            StrafeRight(1750, autoPower); // Strafe back to A4
             sleep(sleepTime);
             SetBrakes(true);
             DriveForward(350, autoPower); //Go forward to pick up cone.
@@ -347,15 +347,15 @@ public class A5PowerPlayAuto extends LinearOpMode {
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.00);
-        sleep(2200);
+        sleep(2300);
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(160,0.15);
+        DriveForward(200,0.15);
         //Release cone
         serv0.setPower(0.18);
         //Back up
-        DriveReverse(160,0.7);
+        DriveReverse(200,0.20);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
