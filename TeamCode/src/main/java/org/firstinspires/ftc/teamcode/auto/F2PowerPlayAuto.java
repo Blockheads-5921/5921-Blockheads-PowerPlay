@@ -357,7 +357,7 @@ public class F2PowerPlayAuto extends LinearOpMode {
         //Release cone
         serv0.setPower(0.18);
         //Back up
-        DriveReverse(75,0.20);
+        DriveReverse(75,0.30);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
