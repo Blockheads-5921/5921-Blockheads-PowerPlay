@@ -18,15 +18,16 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 
 
 
-public class AutoMethods {
+public abstract class AutoMethods extends LinearOpMode {
 
-    HardwareDrive robot;
-    HardwareMap hardWareMap;
-    private ElapsedTime runtime = new ElapsedTime();
-    Constants constants = new Constants();
+    public HardwareDrive robot;
+    public HardwareMap hardWareMap;
+    public ElapsedTime runtime = new ElapsedTime();
+    public Constants constants = new Constants();
+    public CRServo serv0;
 
     public void SetBrakes(boolean brakesOn) {
-        if (brakesOn){
+        if (brakesOn) {
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -234,7 +235,7 @@ public class AutoMethods {
         }
     }
 
-    public void DepositCone(int junctionLevel, CRServo servo) throws InterruptedException {
+    public void DepositCone(int junctionLevel) throws InterruptedException {
         //assumes lift is at bottom
         int targetPos = 0;
         switch (junctionLevel) {
@@ -264,7 +265,7 @@ public class AutoMethods {
         robot.lift.setPower(0.66);
         sleep(1500);
         //Release cone
-        servo.setPower(0.18);
+        serv0.setPower(0.18);
         //Back up
         DriveReverse(160,0.7);
         sleep(250);
