@@ -86,7 +86,7 @@ public abstract class AutoMethods extends LinearOpMode {
         SetBrakes(true);
     }
 
-    public String getConeImage() {
+    public int getConeImage() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -98,14 +98,7 @@ public abstract class AutoMethods extends LinearOpMode {
          **/
         if (tfod != null) {
             tfod.activate();
-
-            // The TensorFlow software will scale the input images from the camera to a lower resolution.
-            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
-            // If your target is at distance greater than 50 cm (20") you can increase the magnification value
-            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
-            // should be set to the value of the images used to create the TensorFlow Object Detection model
-            // (typically 16/9).
-            tfod.setZoom(1.0, 16.0 / 9.0);
+            tfod.setZoom(1.0, 16.0 / 9.0); //zoom image, could be very useful
         }
 
         String recognizedImage = null;
@@ -123,7 +116,7 @@ public abstract class AutoMethods extends LinearOpMode {
                     double row = (recognition.getTop() + recognition.getBottom()) / 2;
                     double width = Math.abs(recognition.getRight() - recognition.getLeft());
                     double height = Math.abs(recognition.getTop() - recognition.getBottom());
-                    recognizedImage = recognition.getLabel();
+                    recognizedImage = recognition.getLabel(); //why does this work?
 
                     telemetry.addData("", " ");
                     telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
@@ -133,7 +126,19 @@ public abstract class AutoMethods extends LinearOpMode {
                 }
             }
         }
-        return recognizedImage;
+        int picNum = -1;
+        switch (recognizedImage) {
+            case "1 Bolt":
+                picNum = 1;
+                break;
+            case "2 Bulb":
+                picNum = 2;
+                break;
+            case "3 Panels":
+                picNum = 3;
+                break;
+        }
+        return picNum;
     }
 
     private void initVuforia() {

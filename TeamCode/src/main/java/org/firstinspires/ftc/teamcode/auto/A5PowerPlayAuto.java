@@ -68,7 +68,19 @@ public class A5PowerPlayAuto extends AutoMethods {
 
         // SCRIPT FOR STARTING AT A5
 
-
+        double autoPower = 0.40;
+        int imageNo = getConeImage();
+        switch (imageNo) {
+            case 1:
+                StrafeLeft(1200, autoPower);
+                break;
+            case 2:
+                break;
+            case 3:
+                StrafeRight(1200, autoPower);
+                break;
+        }
+        DriveForward(1200, autoPower);
 
         /*
         double autoPower = 0.40;
