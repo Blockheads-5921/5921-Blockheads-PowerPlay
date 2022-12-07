@@ -67,6 +67,10 @@ public class A5PowerPlayAuto extends AutoMethods {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT A5
+
+
+
+        /*
         double autoPower = 0.40;
         int sleepTime = 1;
         serv0.setPower(-0.1);
@@ -100,6 +104,8 @@ public class A5PowerPlayAuto extends AutoMethods {
         DriveForward(300, autoPower); //go to our substation
         sleep(sleepTime);
         SetBrakes(true);
+
+         */
 
     }
 }

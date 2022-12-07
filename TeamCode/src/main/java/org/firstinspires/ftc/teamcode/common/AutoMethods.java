@@ -86,7 +86,7 @@ public abstract class AutoMethods extends LinearOpMode {
         SetBrakes(true);
     }
 
-    public void getConeImage() {
+    public String getConeImage() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -105,9 +105,10 @@ public abstract class AutoMethods extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1.0, 16.0/9.0);
+            tfod.setZoom(1.0, 16.0 / 9.0);
         }
 
+        String recognizedImage = null;
         if (tfod != null) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
@@ -122,15 +123,17 @@ public abstract class AutoMethods extends LinearOpMode {
                     double row = (recognition.getTop() + recognition.getBottom()) / 2;
                     double width = Math.abs(recognition.getRight() - recognition.getLeft());
                     double height = Math.abs(recognition.getTop() - recognition.getBottom());
+                    recognizedImage = recognition.getLabel();
 
                     telemetry.addData("", " ");
                     telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
                     telemetry.addData("- Position (Row/Col)", "%.0f / %.0f", row, col);
                     telemetry.addData("- Size (Width/Height)", "%.0f / %.0f", width, height);
+                    telemetry.update();
                 }
-                telemetry.update();
             }
         }
+        return recognizedImage;
     }
 
     private void initVuforia() {
