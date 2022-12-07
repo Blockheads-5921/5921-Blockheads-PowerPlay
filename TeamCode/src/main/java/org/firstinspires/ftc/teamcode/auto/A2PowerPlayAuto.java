@@ -38,6 +38,11 @@ import com.qualcomm.robotcore.util.RobotLog;
 import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.Set;
 
@@ -45,6 +50,18 @@ import java.util.Set;
 @Autonomous(name="Robot: A2PowerPlayAuto", group="Robot")
 //@Disabled
 public class A2PowerPlayAuto extends LinearOpMode {
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String[] LABELS = {
+            "1 Bolt",
+            "2 Bulb",
+            "3 Panel"
+    };
+    private static final String VUFORIA_KEY =
+            "AaKd3K3/////AAABmbEXeRKKtUzcqa1Tm5CDOkdJ5/gdsHlZH8to976NByBP9kxz11aApGntLM40oaXUm4wvKkzhoz8wmwEOHWBce+Mx3M1l/8uQ3Ys4BZoWEKt+b+LCVCOg8oxNplp3WJFw0jgVLetgTfL/NFtI4jlygxlPkgaHlRKFWyJiZ5nX84+brBTBCL1rekx78AsFElJbTgeI+GNr8GNjnIuXhRQ+WWDiriWD04abmrmyh4HoVVTmElg+/9zdKW9seASyq/4/Z4kQt9ViprVbSD2MjxgBetXJ4PTWm4KAzkJE/gejgoiCSPGKecdCav+un5wFPRw5Y/AogVpBHDWeHmXHkgfG+NiMwK/2Ebyu3/PsLdyNDJxd";
+    // maybe illegal???
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+
 
     Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
@@ -363,5 +380,36 @@ public class A2PowerPlayAuto extends LinearOpMode {
         robot.lift.setPower(0.75);
         sleep(750);
         SetBrakes(true);
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.20f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 300;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
