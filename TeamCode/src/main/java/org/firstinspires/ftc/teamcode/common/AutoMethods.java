@@ -1,30 +1,168 @@
 package org.firstinspires.ftc.teamcode.common;
-
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
+
+// Import vuforia related stuff
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Constants;
 
+import java.util.List;
 
 
 public abstract class AutoMethods extends LinearOpMode {
+    // vuforia stuff
+    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String[] LABELS = {
+            "1 Bolt",
+            "2 Bulb",
+            "3 Panel"
+    };
+    private static final String VUFORIA_KEY =
+            "AaKd3K3/////AAABmbEXeRKKtUzcqa1Tm5CDOkdJ5/gdsHlZH8to976NByBP9kxz11aApGntLM40oaXUm4wvKkzhoz8wmwEOHWBce+Mx3M1l/8uQ3Ys4BZoWEKt+b+LCVCOg8oxNplp3WJFw0jgVLetgTfL/NFtI4jlygxlPkgaHlRKFWyJiZ5nX84+brBTBCL1rekx78AsFElJbTgeI+GNr8GNjnIuXhRQ+WWDiriWD04abmrmyh4HoVVTmElg+/9zdKW9seASyq/4/Z4kQt9ViprVbSD2MjxgBetXJ4PTWm4KAzkJE/gejgoiCSPGKecdCav+un5wFPRw5Y/AogVpBHDWeHmXHkgfG+NiMwK/2Ebyu3/PsLdyNDJxd";
+    // possibly illegal
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+
 
     public HardwareDrive robot;
     public HardwareMap hardWareMap;
     public ElapsedTime runtime = new ElapsedTime();
     public Constants constants = new Constants();
     public CRServo serv0;
+
+    public void DepositCone(int junctionLevel) throws InterruptedException {
+        //assumes lift is at bottom
+        int targetPos = 0;
+        switch (junctionLevel) {
+            case 1:
+                targetPos = Constants.elevatorPositionLow;
+                break;
+            case 2:
+                targetPos = Constants.elevatorPositionMid;
+                break;
+            case 3:
+                targetPos = Constants.elevatorPositionTop;
+                break;
+        }
+        //raise arm
+        robot.lift.setTargetPosition(targetPos);
+        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(1.00);
+        sleep(2200);
+        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
+        //Drive forward
+        SetBrakes(false);
+        DriveForward(160,0.15);
+        //Lower arm
+        robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.66);
+        sleep(1500);
+        //Release cone
+        serv0.setPower(0.18);
+        //Back up
+        DriveReverse(160,0.7);
+        sleep(250);
+        //lower arm fully
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.75);
+        sleep(750);
+        SetBrakes(true);
+    }
+
+    public void getConeImage() {
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+        initTfod();
+
+        /**
+         * Activate TensorFlow Object Detection before we wait for the start command.
+         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         **/
+        if (tfod != null) {
+            tfod.activate();
+
+            // The TensorFlow software will scale the input images from the camera to a lower resolution.
+            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+            // If your target is at distance greater than 50 cm (20") you can increase the magnification value
+            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+            // should be set to the value of the images used to create the TensorFlow Object Detection model
+            // (typically 16/9).
+            tfod.setZoom(1.0, 16.0/9.0);
+        }
+
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Objects Detected", updatedRecognitions.size());
+
+                // step through the list of recognitions and display image position/size information for each one
+                // Note: "Image number" refers to the randomized image orientation/number
+                for (Recognition recognition : updatedRecognitions) {
+                    double col = (recognition.getLeft() + recognition.getRight()) / 2;
+                    double row = (recognition.getTop() + recognition.getBottom()) / 2;
+                    double width = Math.abs(recognition.getRight() - recognition.getLeft());
+                    double height = Math.abs(recognition.getTop() - recognition.getBottom());
+
+                    telemetry.addData("", " ");
+                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+                    telemetry.addData("- Position (Row/Col)", "%.0f / %.0f", row, col);
+                    telemetry.addData("- Size (Width/Height)", "%.0f / %.0f", width, height);
+                }
+                telemetry.update();
+            }
+        }
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "log920");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 300;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
 
     public void SetBrakes(boolean brakesOn) {
         if (brakesOn) {
@@ -233,47 +371,5 @@ public abstract class AutoMethods extends LinearOpMode {
             telemetry.update();
             RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
-    }
-
-    public void DepositCone(int junctionLevel) throws InterruptedException {
-        //assumes lift is at bottom
-        int targetPos = 0;
-        switch (junctionLevel) {
-            case 1:
-                targetPos = Constants.elevatorPositionLow;
-                break;
-            case 2:
-                targetPos = Constants.elevatorPositionMid;
-                break;
-            case 3:
-                targetPos = Constants.elevatorPositionTop;
-                break;
-        }
-        //raise arm
-        robot.lift.setTargetPosition(targetPos);
-        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(1.00);
-        sleep(2200);
-        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
-        //Drive forward
-        SetBrakes(false);
-        DriveForward(160,0.15);
-        //Lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionAboveCone);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.66);
-        sleep(1500);
-        //Release cone
-        serv0.setPower(0.18);
-        //Back up
-        DriveReverse(160,0.7);
-        sleep(250);
-        //lower arm fully
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.75);
-        sleep(750);
-        SetBrakes(true);
     }
 }
