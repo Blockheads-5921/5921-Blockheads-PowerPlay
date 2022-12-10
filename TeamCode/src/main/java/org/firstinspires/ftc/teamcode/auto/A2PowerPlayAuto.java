@@ -102,7 +102,7 @@ public class A2PowerPlayAuto extends LinearOpMode {
         DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
+        for (int i = 0; i < 2; i++) { //go back and forth between substation and high junction
             StrafeRight(1700, autoPower); //move to high pole
             sleep(sleepTime);
             SetBrakes(true);
