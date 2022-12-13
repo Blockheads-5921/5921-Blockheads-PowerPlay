@@ -148,6 +148,7 @@ public class CvExperimentsA2 extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT A2
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/auto/CvExperimentsA2.java
         double drivePower = 0.40;
         switch (mostSeenImage) {
             case 0:
@@ -158,6 +159,37 @@ public class CvExperimentsA2 extends LinearOpMode {
             case 2:
                 StrafeRight(1200, drivePower);
                 break;
+=======
+        double autoPower = 0.40;
+        int sleepTime = 1;
+        serv0.setPower(-0.1);
+        sleep(sleepTime);
+        DriveForward(200, autoPower);
+        sleep(sleepTime);
+        SpinLeft(920, autoPower); //face towards cones
+        sleep(sleepTime);
+        SetBrakes(true);
+        DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
+        sleep(sleepTime);
+        SetBrakes(true);
+        for (int i = 0; i < 2; i++) { //go back and forth between substation and high junction
+            StrafeRight(1700, autoPower); //move to high pole
+            sleep(sleepTime);
+            SetBrakes(true);
+            DepositCone(3); //drop cone on high pole (height 3)
+            StrafeLeft(1700, autoPower); // Strafe back to A3
+            sleep(sleepTime);
+            SetBrakes(true);
+            DriveForward(350, autoPower); //Go forward to pick up cone
+            sleep(sleepTime);
+            SetBrakes(true);
+            serv0.setPower(-0.1); //Pick up cone
+            sleep(500);
+            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
+            sleep(sleepTime);
+            SetBrakes(true);
+            sleep(200);
+>>>>>>> f93038d94659cc7e7e5f57c5bb7e57b7e81a543a:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/auto/A2PowerPlayAuto.java
         }
 
     }
