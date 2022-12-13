@@ -44,8 +44,8 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 import java.util.Set;
 
 
-@Autonomous(name="Robot: A5PowerPlayAuto", group="Robot")
-public class A5PowerPlayAuto extends AutoMethods {
+@Autonomous(name="Robot: RefactoringTestsA5", group="Robot")
+public class RefactoringTestsA5 extends AutoMethods {
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);

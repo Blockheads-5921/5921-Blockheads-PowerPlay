@@ -44,12 +44,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.List;
 import java.util.Set;
 
 
-@Autonomous(name="Robot: A2PowerPlayAuto", group="Robot")
+@Autonomous(name="Robot: CvExperimentsA2", group="Robot")
 //@Disabled
-public class A2PowerPlayAuto extends LinearOpMode {
+public class CvExperimentsA2 extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     private static final String[] LABELS = {
             "1 Bolt",
@@ -75,12 +76,69 @@ public class A2PowerPlayAuto extends LinearOpMode {
         serv0 = hardwareMap.get(CRServo.class, "serv0");
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");    //
+        telemetry.addData("Status", "Ready to run");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         RobotLog.d("5921","Step4");
+
+        //START TFOD STUFF
+
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+        initTfod();
+
+        /**
+         * Activate TensorFlow Object Detection before we wait for the start command.
+         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         **/
+        if (tfod != null) {
+            tfod.activate();
+            // You can zoom with this function
+            tfod.setZoom(1.0, 16.0/9.0);
+        }
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+        waitForStart();
+
+
+        if (tfod != null) {
+
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                int[] rCounts = new int[] {0,0,0};
+                telemetry.addData("# Objects Detected", updatedRecognitions.size());
+                for (Recognition recognition : updatedRecognitions) {
+                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+                    // Find recognised image with highest count. If we see a bias, we could change
+                    // the counters' initial values.
+                    switch (recognition.getLabel()) {
+                        case "1 Bolt":
+                            rCounts[0]++;
+                            break;
+                        case "2 Bulb":
+                            rCounts[1]++;
+                            break;
+                        case "3 Panels":
+                            rCounts[2]++;
+                            break;
+                    }
+                }
+                int mostCountsYet = 0;
+                int mostSeenImage = -1;
+                for (int i = 0; i < 3; i++) {
+                    if (rCounts[i] > mostCountsYet) {
+                        mostCountsYet = rCounts[i];
+                        mostSeenImage = i; //Our final value
+                    }
+                }
+                telemetry.update();
+            }
+        }
 
         // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
         // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
@@ -90,39 +148,20 @@ public class A2PowerPlayAuto extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT A2
-        double autoPower = 0.40;
-        int sleepTime = 1;
-        serv0.setPower(-0.1);
-        sleep(sleepTime);
-        DriveForward(200, autoPower);
-        sleep(sleepTime);
-        SpinLeft(920, autoPower); //face towards cones
-        sleep(sleepTime);
-        SetBrakes(true);
-        DriveForward(1025, autoPower); //move robot to pad A3, we're basing all operations on row 3
-        sleep(sleepTime);
-        SetBrakes(true);
-        for (int i = 0; i < 2; i++){ //go back and forth between substation and high junction
-            StrafeRight(1700, autoPower); //move to high pole
-            sleep(sleepTime);
-            SetBrakes(true);
-            DepositCone(3); //drop cone on high pole (height 3)
-            StrafeLeft(1700, autoPower); // Strafe back to A3
-            sleep(sleepTime);
-            SetBrakes(true);
-            DriveForward(350, autoPower); //Go forward to pick up cone
-            sleep(sleepTime);
-            SetBrakes(true);
-            serv0.setPower(-0.1); //Pick up cone
-            sleep(500);
-            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at A3 again.
-            sleep(sleepTime);
-            SetBrakes(true);
-            sleep(200);
+        /*
+        switch(imageNum) {
+            case 1:
+                StrafeLeft(500, drivePower);
+                break;
+            case 2:
+                break;
+            case 3:
+                StrafeRight(500, drivePower);
+                break;
+
         }
-        DriveReverse(2095, autoPower); //go to our terminal
-        sleep(sleepTime);
-        SetBrakes(true);
+
+         */
 
     }
 
