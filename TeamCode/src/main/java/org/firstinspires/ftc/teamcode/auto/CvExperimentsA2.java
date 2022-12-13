@@ -81,7 +81,7 @@ public class CvExperimentsA2 extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        RobotLog.d("5921","Step4");
+        RobotLog.d("5921", "Step4");
 
         //START TFOD STUFF
 
@@ -97,7 +97,7 @@ public class CvExperimentsA2 extends LinearOpMode {
         if (tfod != null) {
             tfod.activate();
             // You can zoom with this function
-            tfod.setZoom(1.0, 16.0/9.0);
+            tfod.setZoom(1.0, 16.0 / 9.0);
         }
 
         /** Wait for the game to begin */
@@ -106,14 +106,15 @@ public class CvExperimentsA2 extends LinearOpMode {
         waitForStart();
 
 
+        int mostSeenImage = 0;
         if (tfod != null) {
 
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-                int[] rCounts = new int[] {0,0,0};
+                int[] rCounts = new int[]{0, 0, 0};
                 telemetry.addData("# Objects Detected", updatedRecognitions.size());
                 for (Recognition recognition : updatedRecognitions) {
-                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
+                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
                     // Find recognised image with highest count. If we see a bias, we could change
                     // the counters' initial values.
                     switch (recognition.getLabel()) {
@@ -129,7 +130,7 @@ public class CvExperimentsA2 extends LinearOpMode {
                     }
                 }
                 int mostCountsYet = 0;
-                int mostSeenImage = -1;
+                mostSeenImage = -1;
                 for (int i = 0; i < 3; i++) {
                     if (rCounts[i] > mostCountsYet) {
                         mostCountsYet = rCounts[i];
@@ -144,24 +145,20 @@ public class CvExperimentsA2 extends LinearOpMode {
         // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
         // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
 
-
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT A2
-        /*
-        switch(imageNum) {
+        double drivePower = 0.40;
+        switch (mostSeenImage) {
+            case 0:
+                StrafeLeft(1200, drivePower);
+                break;
             case 1:
-                StrafeLeft(500, drivePower);
                 break;
             case 2:
+                StrafeRight(1200, drivePower);
                 break;
-            case 3:
-                StrafeRight(500, drivePower);
-                break;
-
         }
-
-         */
 
     }
 
