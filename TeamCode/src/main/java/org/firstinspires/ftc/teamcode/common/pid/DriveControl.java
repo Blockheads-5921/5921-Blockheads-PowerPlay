@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.common.pid;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Util;
-import org.firstinspires.ftc.teamcode.common.Utility;
+
+import org.firstinspires.ftc.teamcode.common.auto.Utility;
 
 @Utility.Encapsulate()
 public class DriveControl {
