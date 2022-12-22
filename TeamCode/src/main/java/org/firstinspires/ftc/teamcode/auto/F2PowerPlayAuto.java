@@ -63,7 +63,7 @@ public class F2PowerPlayAuto extends LinearOpMode {
         waitForStart();
         RobotLog.d("5921", "Step4");
 
-        // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
+        // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 920 cnts/90 degrees
         // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
         // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
 
@@ -107,12 +107,23 @@ public class F2PowerPlayAuto extends LinearOpMode {
     }
 
     private void SetBrakes(boolean brakesOn) {
-        if (brakesOn) {
+        if (brakesOn){
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        } else {
+
+            robot.lf.setPower(0);
+            robot.rf.setPower(0);
+            robot.lb.setPower(0);
+            robot.rb.setPower(0);
+
+            robot.lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.lb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        else{
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

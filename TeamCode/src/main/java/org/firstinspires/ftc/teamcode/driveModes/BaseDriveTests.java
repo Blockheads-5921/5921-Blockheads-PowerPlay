@@ -11,9 +11,11 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Utility;
 
-@TeleOp(name = "Base Drive Complete", group = "Drive")
+import java.security.KeyStore;
+
+@TeleOp(name = "Base Drive Tests", group = "Drive")
 //@Disabled
-public class BaseDriveComplete extends LinearOpMode {
+public class BaseDriveTests extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
     private Constants constants = new Constants();
@@ -22,6 +24,8 @@ public class BaseDriveComplete extends LinearOpMode {
     private Button lifterButton = new Button();
     private Button lifterBottomButton = new Button();
     private boolean toggleButton = true;
+    int lTgtPos;
+
 
     @Override
     public void runOpMode() {
@@ -36,48 +40,52 @@ public class BaseDriveComplete extends LinearOpMode {
         while (opModeIsActive()) loop1();
     }
     private void loop1() {
-        UpdateGripper();
-        UpdatePlayers();
-        UpdateTelemetry();
-    }
 
-    private void UpdatePlayers() {
+        if (gamepad2.y) {
+            lTgtPos = Constants.elevatorPositionTop;
+        } else if (gamepad2.x) {
+            lTgtPos = Constants.elevatorPositionMid;
+        } else if (gamepad2.a) {
+            lTgtPos = Constants.elevatorPositionLow;
+        } else if (gamepad2.b) {
+            lTgtPos = Constants.elevatorPositionBottom - 200;
+        } else if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {
+            lTgtPos = Constants.elevatorPositionBottom;
+        }
+
+        if (lTgtPos - robot.lift.getCurrentPosition() > 0) { // lift is too high
+            robot.lift.setPower(1);
+        } else if (lTgtPos - robot.lift.getCurrentPosition() < 0) { // lift is too low
+            robot.lift.setPower(-1);
+        } else {
+            robot.lift.setPower(-0.01);
+        }
+
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
         else if (gamepad1.left_bumper) drivePower = 0.25;
-        DriveTrainBase(drivePower);
+        DriveTrainBase(drivePower, lTgtPos);
         DriveMicroAdjust(0.4);
 
+        UpdateGripper();
+        UpdateTelemetry();
     }
+
     @Utility.Encapsulate
-    private void DriveTrainBase(double drivePower) {
+    private void DriveTrainBase(double drivePower, int lTgtPos) {
         double directionX = Math.pow(gamepad1.left_stick_x, 1); // Strafe
         double directionY = Math.pow(gamepad1.left_stick_y, 1); // Forward
         double directionR = -Math.pow(gamepad1.right_stick_x, 1); // Turn
-        double liftPower = Math.pow(gamepad2.right_stick_y, 1); // Lift
+        // double liftPower = Math.pow(gamepad2.right_stick_y, 1); // Lift
+
         //dead zones
         if (gamepad1.left_stick_x < 0.2 && gamepad1.left_stick_x > -0.2) {directionX = 0;}
         if (gamepad1.left_stick_y < 0.2 && gamepad1.left_stick_y > -0.2) {directionY = 0;}
-        int liftPos = robot.lift.getCurrentPosition();
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
         robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
         robot.lb.setPower((directionY + directionR + directionX) * drivePower);
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
-
-        /*
-                if (gamepad2.y == true) {MoveLiftTo(3); telemetry.addLine("Button y pressed");}
-        if (gamepad2.x == true) {MoveLiftTo(2);}
-        if (gamepad2.a == true) {MoveLiftTo(1);}
-        if (gamepad2.b == true) {MoveLiftTo(0);}
-        if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {MoveLiftTo(-1);}
-         */
-
-        // Make sure we're not letting lift over-extend...
-        if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
-            // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.1);
-        else robot.lift.setPower((liftPower - 0.01) * 0.80);
 
     }
     private void DriveMicroAdjust(double power) {
@@ -156,4 +164,3 @@ public class BaseDriveComplete extends LinearOpMode {
         telemetry.update();
     }
 }
-
