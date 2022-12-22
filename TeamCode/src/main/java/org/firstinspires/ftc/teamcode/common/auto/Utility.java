@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.common;
+package org.firstinspires.ftc.teamcode.common.auto;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
