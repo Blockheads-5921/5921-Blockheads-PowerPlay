@@ -24,7 +24,7 @@ public class BaseDriveTests extends LinearOpMode {
     private Button lifterButton = new Button();
     private Button lifterBottomButton = new Button();
     private boolean toggleButton = true;
-    int lTgtPos;
+    int lTgtPos = 0;
 
 
     @Override
@@ -53,10 +53,13 @@ public class BaseDriveTests extends LinearOpMode {
             lTgtPos = Constants.elevatorPositionBottom;
         }
 
-        if (lTgtPos - robot.lift.getCurrentPosition() > 0) { // lift is too high
-            robot.lift.setPower(1);
-        } else if (lTgtPos - robot.lift.getCurrentPosition() < 0) { // lift is too low
-            robot.lift.setPower(-1);
+        telemetry.addData("Difference between target and current positions", lTgtPos - robot.lift.getCurrentPosition());
+        sleep(1000);
+
+        if (lTgtPos - robot.lift.getCurrentPosition() > 100) { // lift is too high
+            robot.lift.setPower(0.2);
+        } else if (lTgtPos - robot.lift.getCurrentPosition() < 100) { // lift is too low
+            robot.lift.setPower(-0.2);
         } else {
             robot.lift.setPower(-0.01);
         }

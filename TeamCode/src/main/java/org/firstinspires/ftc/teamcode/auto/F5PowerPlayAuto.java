@@ -75,15 +75,13 @@ public class F5PowerPlayAuto extends LinearOpMode {
         // SCRIPT FOR STARTING AT F5
         robot.lift.setTargetPosition(Constants.elevatorPositionMid);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.7);
+        robot.lift.setVelocity(0.7);
         DriveForward(1000,0.20);
         telemetry.addLine("Done with test 1, going to drive then call lift");
         telemetry.update();
         sleep(5000);
         DriveForward(1000,0.20);
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.7);
+        DriveReverse(500, 0.20);
 
 
     }
@@ -95,10 +93,10 @@ public class F5PowerPlayAuto extends LinearOpMode {
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            robot.lf.setPower(0);
-            robot.rf.setPower(0);
-            robot.lb.setPower(0);
-            robot.rb.setPower(0);
+            robot.lf.setVelocity(0);
+            robot.rf.setVelocity(0);
+            robot.lb.setVelocity(0);
+            robot.rb.setVelocity(0);
 
             robot.lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
