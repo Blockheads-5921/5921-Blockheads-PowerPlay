@@ -9,7 +9,7 @@ import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.Utility;
+import org.firstinspires.ftc.teamcode.common.auto.Utility;
 
 import java.security.KeyStore;
 

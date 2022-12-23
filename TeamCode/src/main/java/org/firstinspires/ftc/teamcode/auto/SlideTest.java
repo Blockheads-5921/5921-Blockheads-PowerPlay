@@ -80,18 +80,23 @@ public class SlideTest extends LinearOpMode {
 
     /**
      * A function that uses bezier curves to generate a constant sliding motion across the field
-     * @param forwardEncoderPulses The amount of encoder pulses to move forward can be used as reverse if the value is negative (RELATIVE TO FORWARD)
-     * @param spinEncoderPulses The amount of encoder pulses to turn (RELATIVE TO RIGHT)
-     * @param strafeEncoderPulses The amount of encoder to strafe (RELATIVE)
+     * @param forwardInches The amount of encoder pulses to move forward can be used as reverse if the value is negative (RELATIVE TO FORWARD)
+     * @param spinInches The amount of encoder pulses to turn (RELATIVE TO RIGHT)
+     * @param strafeInches The amount of encoder to strafe (RELATIVE)
      * @param bezierFactor The calculated rate at which the robot's TURN to DRIVE ratio should decrease according to the bezier
      * @param drivePower The amount of power the motors should be allocated
      */
-    private void SimultaneousMovement(int forwardEncoderPulses, int spinEncoderPulses, int strafeEncoderPulses, double bezierFactor, double drivePower) {
+    private void SimultaneousMovement(int forwardInches, int spinInches, int strafeInches, double bezierFactor, double drivePower) {
         utility.resetEncoder(robot);
 
-
-
-
+        if (bezierFactor != (0)) {
+            for (double i = bezierFactor; i < forwardInches; i += 0.1) {
+                robot.lf.setPower(forwardInches);
+                robot.rf.setPower(forwardInches);
+                robot.lb.setPower(forwardInches);
+                robot.rf.setPower(forwardInches);
+            }
+        }
     }
 
     private void SetBrakes(boolean brakesOn) {
