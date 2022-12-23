@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.Utility;
+import org.firstinspires.ftc.teamcode.common.auto.Utility;
 
 @TeleOp(name = "Base Drive Tests", group = "Drive")
 //@Disabled
@@ -53,21 +53,27 @@ public class BaseDriveTests extends LinearOpMode {
         telemetry.addData("Difference between target and current positions", lTgtPos - robot.lift.getCurrentPosition());
         sleep(1000);
 
-        if (lTgtPos - robot.lift.getCurrentPosition() > 100) { // lift is too high
-            robot.lift.setPower(0.2);
-        } else if (lTgtPos - robot.lift.getCurrentPosition() < 100) { // lift is too low
-            robot.lift.setPower(-0.2);
+        int liftTgtOffset = lTgtPos - robot.lift.getCurrentPosition(); // if negative, lift is higher than target position
+
+        if (liftTgtOffset > 100) { // lift is too high
+            robot.lift.setPower(0.75);
+            telemetry.addLine("Lift too high");
+        } else if (liftTgtOffset < -100) { // lift is too low
+            robot.lift.setPower(-0.90);
+            telemetry.addLine("Lift too low");
         } else {
-            robot.lift.setPower(-0.01);
+            robot.lift.setPower(-0.001);
+            telemetry.addLine("Lift position OK");
         }
+
+        if (gamepad2.left_trigger > 0.01) serv0.setPower(0.22 * gamepad2.left_trigger - 0);
+        else if  (gamepad2.right_trigger > 0.01) serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
 
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
         else if (gamepad1.left_bumper) drivePower = 0.25;
         DriveTrainBase(drivePower, lTgtPos);
         DriveMicroAdjust(0.4);
-
-        UpdateGripper();
         UpdateTelemetry();
     }
 
@@ -151,10 +157,7 @@ public class BaseDriveTests extends LinearOpMode {
             robot.lift.setPower(0.01);
         }
     }
-    private void UpdateGripper() {
-        if (gamepad2.left_trigger > 0.01) serv0.setPower(0.22 * gamepad2.left_trigger - 0);
-        else if  (gamepad2.right_trigger > 0.01) serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
-    }
+
     private void UpdateTelemetry() {
         telemetry.addData("g1.X", gamepad1.left_stick_x);
         telemetry.addData("g1.Y", -gamepad1.left_stick_y);

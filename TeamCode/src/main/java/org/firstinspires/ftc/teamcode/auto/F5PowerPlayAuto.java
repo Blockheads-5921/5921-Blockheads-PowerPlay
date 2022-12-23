@@ -73,17 +73,46 @@ public class F5PowerPlayAuto extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT F5
-        robot.lift.setTargetPosition(Constants.elevatorPositionMid);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setVelocity(0.7);
-        DriveForward(1000,0.20);
-        telemetry.addLine("Done with test 1, going to drive then call lift");
-        telemetry.update();
-        sleep(5000);
-        DriveForward(1000,0.20);
-        DriveReverse(500, 0.20);
+        int encoderPulses = 800;
+        double tDrivePower = 0.20;
 
+        robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        double dirX = 0;
+        double dirY = -1;
+        double dirR = -1;
+        double xIncOrDec = 0.01;
+
+        // sean simulator
+
+        for (int i = 0; i < 150; i ++) {
+            dirY += 0.01;
+            if (dirX == 1) { xIncOrDec *= -1;}
+            // make x start decreasing once it's hit 1
+            dirY += xIncOrDec;
+            TOpStyleDrive(dirX, dirY, dirR, 0.2);
+            sleep(20);
+        }
+    }
+
+    private void TOpStyleDrive(double directionX, double directionY, double directionR, double powerCoef){
+        robot.lf.setPower((directionY + directionR - directionX) * powerCoef);
+        robot.rf.setPower((-directionY + directionR - directionX) * powerCoef);
+        robot.lb.setPower((directionY + directionR + directionX) * powerCoef);
+        robot.rb.setPower((-directionY + directionR + directionX) * powerCoef);
     }
 
     private void SetBrakes(boolean brakesOn) {
@@ -108,6 +137,44 @@ public class F5PowerPlayAuto extends LinearOpMode {
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+    }
+
+
+
+    private void DriveForward(int forwardEncoderPulses, double drivePower) {
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        robot.lf.setTargetPosition(-forwardEncoderPulses);
+        robot.rf.setTargetPosition(+forwardEncoderPulses);
+        robot.lb.setTargetPosition(-forwardEncoderPulses);
+        robot.rb.setTargetPosition(+forwardEncoderPulses);
+
+        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.lf.setVelocity(drivePower);
+        robot.rf.setVelocity(drivePower);
+        robot.lb.setVelocity(drivePower);
+        robot.rb.setVelocity(drivePower);
+
+        while (opModeIsActive() &&
+                // (runtime.seconds() < timeoutS) &&
+                (robot.lf.isBusy())) {
+            telemetry.addData("Running to", " %7d ", forwardEncoderPulses);
+            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
+            telemetry.update();
+            RobotLog.d("Forward: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
 
@@ -244,40 +311,6 @@ public class F5PowerPlayAuto extends LinearOpMode {
             telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
             telemetry.update();
             RobotLog.d("SpinRight: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
-        }
-    }
-
-    private void DriveForward(int forwardEncoderPulses, double drivePower) {
-        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        robot.lf.setTargetPosition(-forwardEncoderPulses);
-        robot.rf.setTargetPosition(+forwardEncoderPulses);
-        robot.lb.setTargetPosition(-forwardEncoderPulses);
-        robot.rb.setTargetPosition(+forwardEncoderPulses);
-
-        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lf.setPower(drivePower);
-        robot.rf.setPower(drivePower);
-        robot.lb.setPower(drivePower);
-        robot.rb.setPower(drivePower);
-
-        while (opModeIsActive() &&
-                // (runtime.seconds() < timeoutS) &&
-                (robot.lf.isBusy())) {
-            telemetry.addData("Running to", " %7d ", forwardEncoderPulses);
-            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
-            telemetry.update();
-            RobotLog.d("Forward: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
 
