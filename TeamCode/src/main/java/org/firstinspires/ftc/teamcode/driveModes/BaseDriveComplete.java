@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
@@ -16,12 +15,11 @@ import org.firstinspires.ftc.teamcode.common.auto.Utility;
 public class BaseDriveComplete extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
-    private Constants constants = new Constants();
     private CRServo serv0;
-    private ElapsedTime runtime = new ElapsedTime();
-    private Button lifterButton = new Button();
-    private Button lifterBottomButton = new Button();
-    private boolean toggleButton = true;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private final Button lifterButton = new Button();
+    private final Button lifterBottomButton = new Button();
+    private final boolean toggleButton = true;
 
     @Override
     public void runOpMode() {
@@ -42,9 +40,10 @@ public class BaseDriveComplete extends LinearOpMode {
     }
 
     private void UpdatePlayers() {
-        double drivePower = 0.25;
+        double drivePower;
         if (gamepad1.right_bumper) drivePower = 1;
         else if (gamepad1.left_bumper) drivePower = 0.25;
+        else drivePower = 0.25;
         DriveTrainBase(drivePower);
         DriveMicroAdjust(0.4);
 
@@ -65,17 +64,9 @@ public class BaseDriveComplete extends LinearOpMode {
         robot.lb.setPower((directionY + directionR + directionX) * drivePower);
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
 
-        /*
-                if (gamepad2.y == true) {MoveLiftTo(3); telemetry.addLine("Button y pressed");}
-        if (gamepad2.x == true) {MoveLiftTo(2);}
-        if (gamepad2.a == true) {MoveLiftTo(1);}
-        if (gamepad2.b == true) {MoveLiftTo(0);}
-        if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {MoveLiftTo(-1);}
-         */
-
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
-            // or over-retract
+        // or over-retract
         else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.1);
         else robot.lift.setPower((liftPower - 0.01) * 0.80);
 
@@ -116,14 +107,14 @@ public class BaseDriveComplete extends LinearOpMode {
         }
     }
     private void MoveLiftTo(int jLevel) {
-        telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
+        telemetry.addData("Moving lift to: ", jLevel);
         telemetry.update();
         int jCounts = Constants.elevatorPositionBottom;
         switch (jLevel) {
             case -1:
-                jCounts = Constants.elevatorPositionBottom;
+                jCounts = Constants.elevatorPositionGround;
             case 0:
-                jCounts = Constants.elevatorPositionBottom - 100; //ground junction
+                jCounts = Constants.elevatorPositionBottom;
             case 1:
                 jCounts = Constants.elevatorPositionLow;
             case 2:
@@ -136,12 +127,13 @@ public class BaseDriveComplete extends LinearOpMode {
         robot.lift.setPower(0.7);
         telemetry.addData("Lift being given power and sent to ", jLevel);
         telemetry.update();
-        sleep(jCounts * 750);
-        if (jLevel != -1) {
+        sleep(jCounts * 750L);
+        // this doesn't seem to do anything??
+/*        if (jLevel != -1) {
             robot.lift.setTargetPosition(jCounts + 5);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.01);
-        }
+        }*/
     }
     private void UpdateGripper() {
         if (gamepad2.left_trigger > 0.01) serv0.setPower(0.22 * gamepad2.left_trigger - 0);

@@ -10,8 +10,8 @@ public class Constants {
     public static int elevatorPositionMid = -2100; //Medium junction
     public static int elevatorPositionLow = -1250; //Low junction
     public static int elevatorPositionBottom = -10;
+    public static int elevatorPositionGround = -110;
     public static int elevatorPositionAboveCone = -400;
-    public int elevatorAcrossDrop = -2000;
 
     //Capping Servo Positions
     public double capStart = 0.6; //Straight Up Vertical
