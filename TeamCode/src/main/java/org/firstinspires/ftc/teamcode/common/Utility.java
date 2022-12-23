@@ -70,7 +70,7 @@ public class Utility {
      * A function that either brakes the robot or allows it to float depending on brakesOn.
      * @param brakesOn Whether or not to brake the robot completely
      */
-    private void SetBrakes(boolean brakesOn) {
+    public void SetBrakes(boolean brakesOn) {
         if (brakesOn) {
             this.robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             this.robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -89,7 +89,7 @@ public class Utility {
      * @param straferightEncoderPulses How many encoder pulses the robot should strafe before stopping
      * @param drivePower How much power to allocate to the drive motors
      */
-    public void StrafeRight(int straferightEncoderPulses, double drivePower) {
+    public void StrafeRight(int straferightEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,7 +114,7 @@ public class Utility {
         this.robot.rb.setPower(drivePower);
 
         // update the telemetry monitor
-        while (LinearOpMode.opModeIsActive() && (this.robot.lf.isBusy())) {
+        while (isOpModeActive && (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", straferightEncoderPulses);
             telemetry.addData("Currently at", " at %7d", this.robot.lf.getCurrentPosition());
             telemetry.update();
@@ -128,7 +128,7 @@ public class Utility {
      * @param strafeleftEncoderPulses How many encoder pulses the robot should strafe before stopping
      * @param drivePower How much power to allocate to the drive motors
      */
-    private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
+    public void StrafeLeft(int strafeleftEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -152,7 +152,7 @@ public class Utility {
         this.robot.lb.setPower(drivePower);
         this.robot.rb.setPower(drivePower);
 
-        while (LinearOpMode.opModeIsActive() &&
+        while (isOpModeActive &&
                 // (runtime.seconds() < timeoutS) &&
                 (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", strafeleftEncoderPulses);
@@ -168,7 +168,7 @@ public class Utility {
      * @param spinleftEncoderPulses How many encoder pulses the robot should spin before stopping
      * @param drivePower The amount of power to allocate to the drive motors
      */
-    private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
+    public void SpinLeft(int spinleftEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -192,7 +192,7 @@ public class Utility {
         this.robot.lb.setPower(drivePower);
         this.robot.rb.setPower(drivePower);
 
-        while (LinearOpMode.opModeIsActive() &&
+        while (isOpModeActive &&
                 // (runtime.seconds() < timeoutS) &&
                 (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", spinleftEncoderPulses);
@@ -208,7 +208,7 @@ public class Utility {
      * @param spinrightEncoderPulses How many encoder pulses the robot should spin before stopping
      * @param drivePower The amount of power to allocate to the drive motors
      */
-    private void SpinRight(int spinrightEncoderPulses, double drivePower) {
+    public void SpinRight(int spinrightEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -232,7 +232,7 @@ public class Utility {
         this.robot.lb.setPower(drivePower);
         this.robot.rb.setPower(drivePower);
 
-        while (LinearOpMode.opModeIsActive() &&
+        while (isOpModeActive &&
                 // (runtime.seconds() < timeoutS) &&
                 (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", spinrightEncoderPulses);
@@ -248,7 +248,7 @@ public class Utility {
      * @param forwardEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
      * @param drivePower The amount of power to allocate to the drive motors
      */
-    private void DriveForward(int forwardEncoderPulses, double drivePower) {
+    public void DriveForward(int forwardEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -272,7 +272,7 @@ public class Utility {
         this.robot.lb.setPower(drivePower);
         this.robot.rb.setPower(drivePower);
 
-        while (LinearOpMode.opModeIsActive() &&
+        while (isOpModeActive &&
                 // (runtime.seconds() < timeoutS) &&
                 (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", forwardEncoderPulses);
@@ -288,7 +288,7 @@ public class Utility {
      * @param reverseEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
      * @param drivePower The amount of power to allocate to the drive motors
      */
-    private void DriveReverse(int reverseEncoderPulses, double drivePower) {
+    public void DriveReverse(int reverseEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -312,7 +312,7 @@ public class Utility {
         this.robot.lb.setPower(drivePower);
         this.robot.rb.setPower(drivePower);
 
-        while (LinearOpMode.opModeIsActive() &&
+        while (isOpModeActive &&
                 // (runtime.seconds() < timeoutS) &&
                 (this.robot.lf.isBusy())) {
             telemetry.addData("Running to", " %7d ", reverseEncoderPulses);
