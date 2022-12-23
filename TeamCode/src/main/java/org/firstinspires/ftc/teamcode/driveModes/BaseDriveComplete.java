@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.auto.Utility;
+import org.firstinspires.ftc.teamcode.common.Utility;
 
 @TeleOp(name = "Base Drive Complete", group = "Drive")
 //@Disabled
