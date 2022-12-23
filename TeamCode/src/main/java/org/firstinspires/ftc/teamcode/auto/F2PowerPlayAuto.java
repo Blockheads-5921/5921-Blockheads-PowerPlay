@@ -112,16 +112,6 @@ public class F2PowerPlayAuto extends LinearOpMode {
             robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-            robot.lf.setPower(0);
-            robot.rf.setPower(0);
-            robot.lb.setPower(0);
-            robot.rb.setPower(0);
-
-            robot.lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.lb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         else{
             robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

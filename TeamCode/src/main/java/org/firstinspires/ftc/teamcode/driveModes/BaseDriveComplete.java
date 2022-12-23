@@ -76,8 +76,8 @@ public class BaseDriveComplete extends LinearOpMode {
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
             // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.1);
-        else robot.lift.setPower((liftPower - 0.01) * 0.80);
+        else if (liftPos > Constants.elevatorPositionBottom + 50) robot.lift.setPower((liftPower) * 0.1);
+        else robot.lift.setPower((liftPower - 0.001) * 0.90);
 
     }
     private void DriveMicroAdjust(double power) {

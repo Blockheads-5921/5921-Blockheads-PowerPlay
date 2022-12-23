@@ -77,6 +77,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
+        serv0 = hardwareMap.get(CRServo.class, "serv0");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "log920"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
@@ -166,7 +167,7 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         /* Actually do something useful */
 
-        double autoPower = 0.40;
+        double autoPower = 0.20;
         /*
         drive forward to column c
         strafe to c1 (home tile).
@@ -185,35 +186,37 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         strafe right to center on column c
          */
         DriveForward(2200, autoPower);
-        sleep(1);
         SetBrakes(true);
-        StrafeRight(1048, autoPower);
-        sleep(1);
+        StrafeRight(1150, autoPower);
         SetBrakes(true);
         DriveReverse(300, autoPower);
-        sleep(1);
         SetBrakes(true);
-        SpinRight(67, autoPower); // we are now between cone stack and low junction facing the junction
-        sleep(1);
+        SpinLeft(1144, autoPower); // we are now between cone stack and low junction facing the junction
         SetBrakes(true);
-        DepositCone(1);
+        DriveForward(50, autoPower);
+        SetBrakes(true);
+        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.67);
+        sleep(1000);
+        serv0.setPower(0.18);
 
         for(int cycle=0; cycle<4; cycle++) {
             // go to cone stacks
             SpinRight(1840, autoPower);
             DriveForward(200, autoPower);
             // pick up cone
-            robot.lift.setTargetPosition(-450 + 90*cycle);
+            robot.lift.setTargetPosition(-450 + 50*cycle);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.67);
+            sleep(800);
             serv0.setPower(-0.1);
             robot.lift.setTargetPosition(Constants.elevatorPositionLow);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(1.0);
-            sleep(1); // idk which ones are fire-and-forget and stuff, let's just pretend
+            sleep(800); // idk which ones are fire-and-forget and stuff, let's just pretend
                                 // for now that the lift is at the top
-            robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            robot.lift.setPower(0);
+            robot.lift.setPower(0.001);
             // go to junction
             SpinRight(1840, autoPower);
             DriveForward(200, autoPower);
@@ -239,7 +242,6 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         }else{
             //right trajectory- we're already here
         }
-         */
         //maybe put down final cone on nearest pole to signal zone?
 
 
