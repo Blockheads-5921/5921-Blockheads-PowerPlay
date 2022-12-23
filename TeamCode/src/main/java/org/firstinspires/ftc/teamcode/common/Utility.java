@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
 
 public class Utility {
     private final HardwareDrive robot;
-    private final CRServo servo;
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD, ElementType.TYPE})
@@ -28,7 +27,6 @@ public class Utility {
     // constructor
     public Utility(HardwareDrive robot, CRServo servoMotor) {
         this.robot = robot;
-        this.servo = servoMotor;
     }
 
     /**
@@ -45,26 +43,26 @@ public class Utility {
         this.robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
-    /**
-     * A function that uses bezier curves to generate a constant sliding motion across the field.
-     * @param forwardInches The amount of encoder pulses to move forward can be used as reverse if the value is negative (RELATIVE TO FORWARD)
-     * @param spinInches The amount of encoder pulses to turn (RELATIVE TO RIGHT)
-     * @param strafeInches The amount of encoder to strafe (RELATIVE)
-     * @param bezierFactor The calculated rate at which the robot's TURN to DRIVE ratio should decrease according to the bezier
-     * @param drivePower The amount of power the motors should be allocated
-     */
-    public void SimultaneousMovement(int forwardInches, int spinInches, int strafeInches, double bezierFactor, double drivePower) {
-        this.resetEncoder();
-
-        if (bezierFactor != (0)) {
-            for (double i = bezierFactor; i < forwardInches; i += 0.1) {
-                this.robot.lf.setPower(forwardInches);
-                this.robot.rf.setPower(forwardInches);
-                this.robot.lb.setPower(forwardInches);
-                this.robot.rf.setPower(forwardInches);
-            }
-        }
-    }
+//    /**
+//     * A function that uses bezier curves to generate a constant sliding motion across the field.
+//     * @param forwardInches The amount of encoder pulses to move forward can be used as reverse if the value is negative (RELATIVE TO FORWARD)
+//     * @param spinInches The amount of encoder pulses to turn (RELATIVE TO RIGHT)
+//     * @param strafeInches The amount of encoder to strafe (RELATIVE)
+//     * @param bezierFactor The calculated rate at which the robot's TURN to DRIVE ratio should decrease according to the bezier
+//     * @param drivePower The amount of power the motors should be allocated
+//     */
+//    public void SimultaneousMovement(int forwardInches, int spinInches, int strafeInches, double bezierFactor, double drivePower) {
+//        this.resetEncoder();
+//
+//        if (bezierFactor != (0)) {
+//            for (double i = bezierFactor; i < forwardInches; i += 0.1) {
+//                this.robot.lf.setPower(forwardInches);
+//                this.robot.rf.setPower(forwardInches);
+//                this.robot.lb.setPower(forwardInches);
+//                this.robot.rf.setPower(forwardInches);
+//            }
+//        }
+//    }
 
     /**
      * A function that either brakes the robot or allows it to float depending on brakesOn.
@@ -321,5 +319,12 @@ public class Utility {
             RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", this.robot.lf.getCurrentPosition(),
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
+    }
+
+    public static String happiHappiYay(String whatIsWorking) {
+        telemetry.addData("Vewy vewy happi bc dis is working: ", whatIsWorking);
+
+        if (whatIsWorking == null) return "";
+        else return whatIsWorking;
     }
 }
