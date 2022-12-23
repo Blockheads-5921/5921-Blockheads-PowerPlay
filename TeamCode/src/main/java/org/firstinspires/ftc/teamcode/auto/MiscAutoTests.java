@@ -42,9 +42,9 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 import java.util.Set;
 
 
-@Autonomous(name="Robot: F5PowerPlayAuto", group="Robot")
+@Autonomous(name="Robot: Misc Auto Tests", group="Robot")
 //@Disabled
-public class F5PowerPlayAuto extends LinearOpMode {
+public class MiscAutoTests extends LinearOpMode {
 
     Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
@@ -65,16 +65,6 @@ public class F5PowerPlayAuto extends LinearOpMode {
         waitForStart();
         RobotLog.d("5921", "Step4");
 
-        // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
-        // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
-        // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
-
-
-        // PUT AUTONOMOUS SCRIPT HERE
-
-        // SCRIPT FOR STARTING AT F5
-        int encoderPulses = 800;
-        double tDrivePower = 0.20;
 
         robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -91,24 +81,40 @@ public class F5PowerPlayAuto extends LinearOpMode {
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
+        // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
+        // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
+        // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
+
+
+        // PUT AUTONOMOUS SCRIPT HERE
+
+        // SCRIPT FOR STARTING AT F5
+        int encoderPulses = 800;
+        double tDrivePower = 0.20;
+
+
         double dirX = 0;
         double dirY = -1;
-        double dirR = -1;
+        double dirR = 0.75;
         double xIncOrDec = 0.01;
 
         // sean simulator
 
         for (int i = 0; i < 150; i ++) {
             dirY += 0.01;
-            if (dirX == 1) { xIncOrDec *= -1;}
             // make x start decreasing once it's hit 1
-            dirY += xIncOrDec;
+            if (dirX >= 1.00) { xIncOrDec *= -1; telemetry.addLine("Turning X back down");}
+            dirX += xIncOrDec;
             TOpStyleDrive(dirX, dirY, dirR, 0.2);
+            telemetry.addData("Values", "dirX: %f dirY: %f dirR: %f xIncOrDec: %f", dirX, dirY, dirR, xIncOrDec);
+            telemetry.update();
             sleep(20);
         }
     }
 
     private void TOpStyleDrive(double directionX, double directionY, double directionR, double powerCoef){
+        directionY *= -1;
+        directionR *= -1;
         robot.lf.setPower((directionY + directionR - directionX) * powerCoef);
         robot.rf.setPower((-directionY + directionR - directionX) * powerCoef);
         robot.lb.setPower((directionY + directionR + directionX) * powerCoef);

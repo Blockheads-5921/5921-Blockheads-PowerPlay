@@ -41,9 +41,9 @@ import org.firstinspires.ftc.teamcode.common.Constants;
 
 import java.util.Set;
 
-@Autonomous(name = "Robot: F2PowerPlayAuto", group = "Robot")
+@Autonomous(name = "Robot: Meet 1 Ref Auto", group = "Robot")
 // @Disabled
-public class F2PowerPlayAuto extends LinearOpMode {
+public class M1RefAuto extends LinearOpMode {
 
     Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
