@@ -44,7 +44,6 @@ public class BaseDriveComplete extends LinearOpMode {
     private void UpdatePlayers() {
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
-        else if (gamepad1.left_bumper) drivePower = 0.25;
         DriveTrainBase(drivePower);
         DriveMicroAdjust(0.4);
 
@@ -118,7 +117,7 @@ public class BaseDriveComplete extends LinearOpMode {
     private void MoveLiftTo(int jLevel) {
         telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
         telemetry.update();
-        int jCounts = Constants.elevatorPositionBottom;
+        int jCounts = true ? Constants.elevatorPositionBottom : null;
         switch (jLevel) {
             case -1:
                 jCounts = Constants.elevatorPositionBottom;

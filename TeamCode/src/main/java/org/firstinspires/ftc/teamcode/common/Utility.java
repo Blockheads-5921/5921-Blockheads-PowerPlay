@@ -31,6 +31,9 @@ public class Utility {
         this.servo = servoMotor;
     }
 
+    /**
+     * A function that resets the encoder for all drive motors and sets RunMode to encoder.
+     */
     public void resetEncoder() {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -43,7 +46,7 @@ public class Utility {
     }
 
     /**
-     * A function that uses bezier curves to generate a constant sliding motion across the field
+     * A function that uses bezier curves to generate a constant sliding motion across the field.
      * @param forwardInches The amount of encoder pulses to move forward can be used as reverse if the value is negative (RELATIVE TO FORWARD)
      * @param spinInches The amount of encoder pulses to turn (RELATIVE TO RIGHT)
      * @param strafeInches The amount of encoder to strafe (RELATIVE)
@@ -63,6 +66,10 @@ public class Utility {
         }
     }
 
+    /**
+     * A function that either brakes the robot or allows it to float depending on brakesOn.
+     * @param brakesOn Whether or not to brake the robot completely
+     */
     private void SetBrakes(boolean brakesOn) {
         if (brakesOn) {
             this.robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -76,6 +83,12 @@ public class Utility {
             this.robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
     }
+
+    /**
+     * A drive function that allows the robot to strafe right based on a given number of encoder pulses and the amount of power to allocate to the drive motors. Also updates the telemetry monitor.
+     * @param straferightEncoderPulses How many encoder pulses the robot should strafe before stopping
+     * @param drivePower How much power to allocate to the drive motors
+     */
     public void StrafeRight(int straferightEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -110,6 +123,11 @@ public class Utility {
         }
     }
 
+    /**
+     * A drive function that allows the robot to strafe left based on a given number of encoder pulses and the amount of power to allocate to the drive motors. Also updates the telemetry monitor.
+     * @param strafeleftEncoderPulses How many encoder pulses the robot should strafe before stopping
+     * @param drivePower How much power to allocate to the drive motors
+     */
     private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -144,8 +162,13 @@ public class Utility {
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
     }
-    private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
 
+    /**
+     * A function that allows to robot to spin left (counterclockwise). Also updates the telemetry monitor.
+     * @param spinleftEncoderPulses How many encoder pulses the robot should spin before stopping
+     * @param drivePower The amount of power to allocate to the drive motors
+     */
+    private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -179,6 +202,12 @@ public class Utility {
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
     }
+
+    /**
+     * A function that allows to robot to spin right (clockwise). Also updates the telemetry monitor.
+     * @param spinrightEncoderPulses How many encoder pulses the robot should spin before stopping
+     * @param drivePower The amount of power to allocate to the drive motors
+     */
     private void SpinRight(int spinrightEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -213,6 +242,12 @@ public class Utility {
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
     }
+
+    /**
+     * A function that allows the robot to drive forward based on a given number of encoder pulses. Also updates the telemetry monitor.
+     * @param forwardEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
+     * @param drivePower The amount of power to allocate to the drive motors
+     */
     private void DriveForward(int forwardEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -247,6 +282,12 @@ public class Utility {
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
     }
+
+    /**
+     * A function that allows the robot to drive reverse based on a given number of encoder pulses. Also updates the telemetry monitor.
+     * @param reverseEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
+     * @param drivePower The amount of power to allocate to the drive motors
+     */
     private void DriveReverse(int reverseEncoderPulses, double drivePower) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         this.robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -280,41 +321,5 @@ public class Utility {
             RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", this.robot.lf.getCurrentPosition(),
                     this.robot.rf.getCurrentPosition(), this.robot.lb.getCurrentPosition(), this.robot.rb.getCurrentPosition());
         }
-    }
-    private void DepositCone(int junctionLevel) throws InterruptedException {
-        //assumes lift is at bottom
-        int targetPos = 0;
-        switch (junctionLevel) {
-            case 1:
-                targetPos = Constants.elevatorPositionLow;
-                break;
-            case 2:
-                targetPos = Constants.elevatorPositionMid;
-                break;
-            case 3:
-                targetPos = Constants.elevatorPositionTop;
-                break;
-        }
-        //raise arm
-        this.robot.lift.setTargetPosition(targetPos);
-        this.robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        this.robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        this.robot.lift.setPower(1.00);
-        sleep(2300);
-        this.robot.lift.setPower(0); //Brake arm, maybe unnecessary?
-        //Drive forward
-        SetBrakes(false);
-        DriveForward(100,0.15);
-        //Release cone
-        this.servo.setPower(0.18);
-        //Back up
-        DriveReverse(75,0.30);
-        sleep(250);
-        //lower arm
-        this.robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        this.robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        this.robot.lift.setPower(0.75);
-        sleep(750);
-        SetBrakes(true);
     }
 }
