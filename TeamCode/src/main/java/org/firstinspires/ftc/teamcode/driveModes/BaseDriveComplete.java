@@ -9,19 +9,19 @@ import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.auto.Utility;
+import org.firstinspires.ftc.teamcode.common.Utility;
 
 @TeleOp(name = "Base Drive Complete", group = "Drive")
 //@Disabled
 public class BaseDriveComplete extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
-    private Constants constants = new Constants();
+    private final Constants constants = new Constants();
     private CRServo serv0;
-    private ElapsedTime runtime = new ElapsedTime();
-    private Button lifterButton = new Button();
-    private Button lifterBottomButton = new Button();
-    private boolean toggleButton = true;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private final Button lifterButton = new Button();
+    private final Button lifterBottomButton = new Button();
+    private final boolean toggleButton = true;
 
     @Override
     public void runOpMode() {
