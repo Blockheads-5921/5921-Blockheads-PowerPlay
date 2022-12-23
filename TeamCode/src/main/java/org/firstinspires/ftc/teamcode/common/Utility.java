@@ -321,10 +321,12 @@ public class Utility {
         }
     }
 
-    public static String happiHappiYay(String whatIsWorking) {
-        telemetry.addData("Vewy vewy happi bc dis is working: ", whatIsWorking);
+    public static class Useless {
+        public static String happiHappiYay(String whatIsWorking) {
+            telemetry.addData("Vewy vewy happi bc dis is working: ", whatIsWorking);
 
-        if (whatIsWorking == null) return "";
-        else return whatIsWorking;
+            if (whatIsWorking == null) return "";
+            else return whatIsWorking;
+        }
     }
 }

@@ -29,6 +29,6 @@ public class LukesBeautifulAutoTests extends LinearOpMode {
         // haha, beautiful one-liners 🙂🙂🙂
         robotMethods.DriveForward(240, 0.4, opModeIsActive());
         robotMethods.DriveReverse(240, 0.4, opModeIsActive());
-        Utility.happiHappiYay("Everything. Me so happi")
+        Utility.Useless.happiHappiYay("Everything. Me so happi");
     }
 }
