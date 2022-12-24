@@ -113,7 +113,7 @@ public class MiscAutoTests extends LinearOpMode {
             // make x start decreasing once it's hit 1
             if (dirX >= 1.00) { xIncOrDec *= -1; telemetry.addLine("Turning X back down");}
             dirX += xIncOrDec;
-            if (i == 120) {dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions...");}
+            if (i == 120) {dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions");}
             TOpStyleDrive(dirX, dirY, dirR, 0.2);
             telemetry.addData("Values", "dirX: %f dirY: %f dirR: %f xIncOrDec: %f", dirX, dirY, dirR, xIncOrDec);
             telemetry.update();

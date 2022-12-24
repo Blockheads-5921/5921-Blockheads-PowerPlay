@@ -9,19 +9,19 @@ import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.auto.Utility;
+import org.firstinspires.ftc.teamcode.common.Utility;
 
 @TeleOp(name = "Base Drive Complete", group = "Drive")
 //@Disabled
 public class BaseDriveComplete extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
-    private Constants constants = new Constants();
+    private final Constants constants = new Constants();
     private CRServo serv0;
-    private ElapsedTime runtime = new ElapsedTime();
-    private Button lifterButton = new Button();
-    private Button lifterBottomButton = new Button();
-    private boolean toggleButton = true;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private final Button lifterButton = new Button();
+    private final Button lifterBottomButton = new Button();
+    private final boolean toggleButton = true;
 
     @Override
     public void runOpMode() {
@@ -44,7 +44,6 @@ public class BaseDriveComplete extends LinearOpMode {
     private void UpdatePlayers() {
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
-        else if (gamepad1.left_bumper) drivePower = 0.25;
         DriveTrainBase(drivePower);
         DriveMicroAdjust(0.4);
 
@@ -76,8 +75,8 @@ public class BaseDriveComplete extends LinearOpMode {
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
             // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom + 50) robot.lift.setPower((liftPower) * 0.1);
-        else robot.lift.setPower((liftPower - 0.001) * 0.90);
+        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.1);
+        else robot.lift.setPower((liftPower - 0.01) * 0.80);
 
     }
     private void DriveMicroAdjust(double power) {
@@ -118,7 +117,7 @@ public class BaseDriveComplete extends LinearOpMode {
     private void MoveLiftTo(int jLevel) {
         telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
         telemetry.update();
-        int jCounts = Constants.elevatorPositionBottom;
+        int jCounts = true ? Constants.elevatorPositionBottom : null;
         switch (jLevel) {
             case -1:
                 jCounts = Constants.elevatorPositionBottom;

@@ -5,13 +5,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.auto.Utility;
-
-import java.security.KeyStore;
+import org.firstinspires.ftc.teamcode.common.Utility;
 
 @TeleOp(name = "Base Drive Tests", group = "Drive")
 //@Disabled
