@@ -58,7 +58,9 @@ public class MiscAutoTests extends LinearOpMode {
         serv0 = hardwareMap.get(CRServo.class, "serv0");
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");    //
+        telemetry.addData("Status", "Ready to run");
+        telemetry.addData("Starting encoder values: ", "lf %d lb %d rf %d rb %d",
+                robot.lf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.rb.getCurrentPosition());
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -81,6 +83,7 @@ public class MiscAutoTests extends LinearOpMode {
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
+
         // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
         // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
         // VALID COUNTS PER INCH for normal driving as of 10/31/22: 43.651 cnts/inch
@@ -89,27 +92,40 @@ public class MiscAutoTests extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT F5
-        int encoderPulses = 800;
-        double tDrivePower = 0.20;
-
 
         double dirX = 0;
         double dirY = -1;
         double dirR = 0.75;
         double xIncOrDec = 0.01;
 
-        // sean simulator
+        serv0.setPower(-0.1);
+        sleep(200);
 
+        robot.lift.setTargetPosition(Constants.elevatorPositionMid);
+        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.5);
+
+        // sean simulator
         for (int i = 0; i < 150; i ++) {
+            telemetry.addData("Iteration ", i);
             dirY += 0.01;
             // make x start decreasing once it's hit 1
             if (dirX >= 1.00) { xIncOrDec *= -1; telemetry.addLine("Turning X back down");}
             dirX += xIncOrDec;
+            if (i == 120) {dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions...");}
             TOpStyleDrive(dirX, dirY, dirR, 0.2);
             telemetry.addData("Values", "dirX: %f dirY: %f dirR: %f xIncOrDec: %f", dirX, dirY, dirR, xIncOrDec);
             telemetry.update();
             sleep(20);
         }
+        SetBrakes(true);
+        serv0.setPower(0.18);
+
+        telemetry.addData("Ending encoder values: ", "lf %d lb %d rf %d rb %d",
+                robot.lf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.rb.getCurrentPosition());
+        telemetry.update();
+        sleep(30000);
     }
 
     private void TOpStyleDrive(double directionX, double directionY, double directionR, double powerCoef){
@@ -128,10 +144,10 @@ public class MiscAutoTests extends LinearOpMode {
             robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            robot.lf.setVelocity(0);
-            robot.rf.setVelocity(0);
-            robot.lb.setVelocity(0);
-            robot.rb.setVelocity(0);
+            robot.lf.setPower(0);
+            robot.rf.setPower(0);
+            robot.lb.setPower(0);
+            robot.rb.setPower(0);
 
             robot.lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
