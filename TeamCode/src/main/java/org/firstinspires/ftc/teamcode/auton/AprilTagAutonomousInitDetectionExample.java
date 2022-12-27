@@ -226,7 +226,6 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         // Go to signal zone
 
-
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){

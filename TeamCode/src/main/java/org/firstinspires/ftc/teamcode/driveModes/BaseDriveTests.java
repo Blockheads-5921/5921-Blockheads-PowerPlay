@@ -50,8 +50,14 @@ public class BaseDriveTests extends LinearOpMode {
             lTgtPos = Constants.elevatorPositionBottom;
         }
 
-        telemetry.addData("Difference between target and current positions", lTgtPos - robot.lift.getCurrentPosition());
-        sleep(1000);
+        telemetry.addData("Difference between target and current lift positions", lTgtPos - robot.lift.getCurrentPosition());
+
+        // The absolute sum of the positions of the motors of the left side minus the same for the left side.
+        // Proportional to the amount turned.
+        int diffsAbsSidesPosSums = Math.abs(robot.lf.getCurrentPosition() + robot.lb.getCurrentPosition())
+                - Math.abs(robot.rf.getCurrentPosition() + robot.rb.getCurrentPosition());
+
+        telemetry.addData("Abs sum of left motor positions minus abs sum of right motor positions",diffsAbsSidesPosSums);
 
         int liftTgtOffset = lTgtPos - robot.lift.getCurrentPosition(); // if negative, lift is higher than target position
 

@@ -57,17 +57,6 @@ public class MiscAutoTests extends LinearOpMode {
         robot.init(hardwareMap);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");
-        telemetry.addData("Starting encoder values: ", "lf %d lb %d rf %d rb %d",
-                robot.lf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.rb.getCurrentPosition());
-        telemetry.update();
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        RobotLog.d("5921", "Step4");
-
-
         robot.lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -83,6 +72,15 @@ public class MiscAutoTests extends LinearOpMode {
         robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
+        telemetry.addData("Status", "Ready to run");
+        telemetry.addData("Starting encoder values: ", "lf %d lb %d rf %d rb %d",
+                robot.lf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.rb.getCurrentPosition());
+        telemetry.update();
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        RobotLog.d("5921", "Step4");
+
 
         // VALID COUNTS PER 90 DEGREES ROTATION as of 10/31/2022: 4*920 cnts/90 degrees
         // VALID COUNTS PER INCH for strafing as of 10/31/2022: 49.549 cnts/inch
@@ -92,6 +90,8 @@ public class MiscAutoTests extends LinearOpMode {
         // PUT AUTONOMOUS SCRIPT HERE
 
         // SCRIPT FOR STARTING AT F5
+
+        double autoPower = 0.20;
 
         double dirX = 0;
         double dirY = -1;
@@ -113,19 +113,56 @@ public class MiscAutoTests extends LinearOpMode {
             // make x start decreasing once it's hit 1
             if (dirX >= 1.00) { xIncOrDec *= -1; telemetry.addLine("Turning X back down");}
             dirX += xIncOrDec;
+            // Positive x goes to the robot's right, positive y goes forward
             if (i == 120) {dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions");}
-            TOpStyleDrive(dirX, dirY, dirR, 0.2);
+            TOpStyleDrive(dirX, dirY, dirR, autoPower);
             telemetry.addData("Values", "dirX: %f dirY: %f dirR: %f xIncOrDec: %f", dirX, dirY, dirR, xIncOrDec);
             telemetry.update();
             sleep(20);
         }
         SetBrakes(true);
-        serv0.setPower(0.18);
 
+        serv0.setPower(0.18); // Drop cone
+
+        /*
+        telemetry.addLine("Setting target positions...");
+        telemetry.update();
+        robot.lf.setTargetPosition(-2125);
+        robot.lf.setTargetPosition(-220);
+        robot.lf.setTargetPosition(-2613);
+        robot.lf.setTargetPosition(-727);
+
+        telemetry.addLine("Setting mode to RUN_TO_POSITION...");
+        telemetry.update();
+        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Now that we're facing the right direction, we can run to position to correct for any remaining error
+        // surely there's a better way to do this... i wish this were python
+        int[] posErrors = {-2125 - robot.lf.getCurrentPosition(), -229 - robot.lb.getCurrentPosition(),
+                -2613 - robot.rf.getCurrentPosition(), -727 - robot.rf.getCurrentPosition()};
+
+        int maxDiff = 0;
+        for (int cNum: posErrors) {
+            if (cNum > maxDiff) {maxDiff = cNum;}
+        }
+        telemetry.addLine("Setting power...");
+        telemetry.update();
+        if (maxDiff > 50){
+            robot.lf.setPower((posErrors[0]/maxDiff)*autoPower);
+            robot.lb.setPower((posErrors[1]/maxDiff)*autoPower);
+            robot.lb.setPower((posErrors[2]/maxDiff)*autoPower);
+            robot.lb.setPower((posErrors[3]/maxDiff)*autoPower);
+
+        }
+        /*
         telemetry.addData("Ending encoder values: ", "lf %d lb %d rf %d rb %d",
                 robot.lf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rf.getCurrentPosition(), robot.rb.getCurrentPosition());
         telemetry.update();
         sleep(30000);
+         */
     }
 
     private void TOpStyleDrive(double directionX, double directionY, double directionR, double powerCoef){
