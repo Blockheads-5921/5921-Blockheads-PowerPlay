@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.common.Utility;
 public class LukesBeautifulAutoTests extends LinearOpMode {
     HardwareDrive robot = new HardwareDrive();
     private CRServo serv0;
-    private final ElapsedTime runtime = new ElapsedTime();
     private final Utility robotMethods = new Utility(robot, serv0);
 
     @Override
@@ -29,6 +28,7 @@ public class LukesBeautifulAutoTests extends LinearOpMode {
         // haha, beautiful one-liners 🙂🙂🙂
         robotMethods.DriveForward(240, 0.4, opModeIsActive());
         robotMethods.DriveReverse(240, 0.4, opModeIsActive());
+        robotMethods.SpinLeft(240, 0.4, opModeIsActive());
         Utility.Useless.happiHappiYay("Everything. Me so happi");
     }
 }
