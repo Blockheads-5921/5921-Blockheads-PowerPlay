@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 
 import static java.lang.Thread.sleep;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -321,7 +323,9 @@ public class Utility {
         }
     }
 
+    /// <reference client::static()> ///
     public static class Useless {
+        @NonNull
         public static String happiHappiYay(String whatIsWorking) {
             telemetry.addData("Vewy vewy happi bc dis is working: ", whatIsWorking);
 
