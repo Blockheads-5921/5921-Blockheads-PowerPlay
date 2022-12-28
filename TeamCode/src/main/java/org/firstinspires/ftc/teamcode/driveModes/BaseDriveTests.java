@@ -81,7 +81,7 @@ public class BaseDriveTests extends LinearOpMode {
 
         telemetry.addData("Abs sum of left motor positions minus abs sum of right motor positions",diffsAbsSidesPosSums);
 
-        robotAngle = diffsAbsSidesPosSums/12000; // Probably will need some tuning
+        robotAngle = diffsAbsSidesPosSums/33; // Probably will need some tuning
 
         while (Math.abs(robotAngle)>180) { // This may get inefficient as many turns are made
             if (robotAngle < -180) {robotAngle -= -180;}
@@ -146,34 +146,6 @@ public class BaseDriveTests extends LinearOpMode {
             robot.rf.setPower(-power);
             robot.lb.setPower(power);
             robot.rb.setPower(-power);
-        }
-    }
-    private void MoveLiftTo(int jLevel) {
-        telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
-        telemetry.update();
-        int jCounts = Constants.elevatorPositionBottom;
-        switch (jLevel) {
-            case -1:
-                jCounts = Constants.elevatorPositionBottom;
-            case 0:
-                jCounts = Constants.elevatorPositionBottom - 100; //ground junction
-            case 1:
-                jCounts = Constants.elevatorPositionLow;
-            case 2:
-                jCounts = Constants.elevatorPositionMid;
-            case 3:
-                jCounts = Constants.elevatorPositionTop;
-        }
-        robot.lift.setTargetPosition(jCounts);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.7);
-        telemetry.addData("Lift being given power and sent to ", jLevel);
-        telemetry.update();
-        sleep(jCounts * 750);
-        if (jLevel != -1) {
-            robot.lift.setTargetPosition(jCounts + 5);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.01);
         }
     }
 
