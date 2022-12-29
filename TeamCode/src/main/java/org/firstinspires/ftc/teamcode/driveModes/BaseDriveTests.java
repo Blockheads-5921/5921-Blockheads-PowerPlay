@@ -3,6 +3,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.Button;
@@ -22,10 +23,10 @@ public class BaseDriveTests extends LinearOpMode {
     private Button lifterBottomButton = new Button();
     private boolean toggleButton = true;
     int lTgtPos = 0;
-    int robotAngle;
-    int xPower;
-    int yPower;
-    int rPower;
+    int robotAngle = 0;
+    int xPower = 0;
+    int yPower = 0;
+    int rPower = 0;
 
 
     @Override
@@ -36,6 +37,16 @@ public class BaseDriveTests extends LinearOpMode {
         runtime.reset();
         robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         waitForStart();
         while (opModeIsActive()) loop1();
@@ -53,8 +64,6 @@ public class BaseDriveTests extends LinearOpMode {
         } else if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {
             lTgtPos = Constants.elevatorPositionBottom;
         }
-
-        telemetry.addData("Difference between target and current lift positions", lTgtPos - robot.lift.getCurrentPosition());
 
         int liftTgtOffset = lTgtPos - robot.lift.getCurrentPosition(); // if negative, lift is higher than target position
 
@@ -81,12 +90,14 @@ public class BaseDriveTests extends LinearOpMode {
 
         telemetry.addData("Abs sum of left motor positions minus abs sum of right motor positions",diffsAbsSidesPosSums);
 
-        robotAngle = diffsAbsSidesPosSums/33; // Probably will need some tuning
+        robotAngle = diffsAbsSidesPosSums/3; // Probably will need some tuning
 
         while (Math.abs(robotAngle)>180) { // This may get inefficient as many turns are made
-            if (robotAngle < -180) {robotAngle -= -180;}
-            else if (robotAngle > 180) {robotAngle += 180;}
+            if (robotAngle < -180) {robotAngle += 180;}
+            else if (robotAngle > 180) {robotAngle -= 180;}
         }
+
+        telemetry.addData("Angle of robot: ", robotAngle);
 
         if (robotAngle > 0) {yPower = robotAngle/-90 + 1;} // Calculate y power
         else {yPower = robotAngle/90 + 1;}
@@ -99,7 +110,7 @@ public class BaseDriveTests extends LinearOpMode {
         if (gamepad1.right_bumper) drivePower = 1;
         else if (gamepad1.left_bumper) drivePower = 0.25;
 
-        DriveTrainBase(xPower,yPower,-gamepad1.right_stick_x,drivePower);
+        DriveTrainBase(xPower*gamepad1.left_stick_x,yPower*gamepad1.left_stick_y,-gamepad1.right_stick_x,drivePower);
         DriveMicroAdjust(0.4);
         UpdateTelemetry();
     }
@@ -150,11 +161,13 @@ public class BaseDriveTests extends LinearOpMode {
     }
 
     private void UpdateTelemetry() {
+        /*
         telemetry.addData("g1.X", gamepad1.left_stick_x);
         telemetry.addData("g1.Y", -gamepad1.left_stick_y);
         telemetry.addData("g1.R", gamepad1.right_stick_x);
         telemetry.addData("Arm Position", robot.lift.getCurrentPosition());
         telemetry.addData("g2.L", gamepad2.right_stick_y);
+        */
         telemetry.update();
     }
 }
