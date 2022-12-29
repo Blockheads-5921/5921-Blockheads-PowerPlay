@@ -75,7 +75,7 @@ public class BaseDriveComplete extends LinearOpMode {
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
             // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom + 15) robot.lift.setPower((liftPower) * 0.1);
+        else if (liftPos > Constants.elevatorPositionBottom && (gamepad2.right_stick_y > 0)) robot.lift.setPower((liftPower) * 0.01);
         else robot.lift.setPower((liftPower - 0.001) * 0.80);
 
     }

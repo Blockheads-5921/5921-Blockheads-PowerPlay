@@ -114,7 +114,7 @@ public class MiscAutoTests extends LinearOpMode {
             if (dirX >= 1.00) { xIncOrDec *= -1; telemetry.addLine("Turning X back down");}
             dirX += xIncOrDec;
             // Positive x goes to the robot's right, positive y goes forward
-            if (i == 120) {dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions");}
+            if (i == 120) { dirY += 0.56; dirX += 0.2; telemetry.addLine("Boosting linear directions");}
             TOpStyleDrive(dirX, dirY, dirR, autoPower);
             telemetry.addData("Values", "dirX: %f dirY: %f dirR: %f xIncOrDec: %f", dirX, dirY, dirR, xIncOrDec);
             telemetry.update();
