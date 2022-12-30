@@ -167,76 +167,45 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
         /* Actually do something useful */
 
-        double autoPower = 0.20;
-        /*
-        drive forward to column c
-        strafe to c1 (home tile).
-        drive backwards so that the robot is centered on the line between the cones and the junction
-        turn to face low junction //we are now facing a non-cardinal direction
-        put cone on low junction keeping lift up // DepositCone will need some adjustments
-        for cycles in range(cycleNum):
-            turn 180 degrees
-            drive forwards
-            lower lift to fiveConeHeight - oneConeHeight*cycles // arm is lower for each pickup
-            pick up cone
-            raise lift to low junction height
-            turn 180 degrees
-            drop cone // this includes driving forwards
-        turn right 22.5 degrees to face up
-        strafe right to center on column c
-         */
-        DriveForward(2200, autoPower);
-        SetBrakes(true);
-        StrafeRight(1150, autoPower);
-        SetBrakes(true);
-        DriveReverse(300, autoPower);
-        SetBrakes(true);
-        SpinLeft(1144, autoPower); // we are now between cone stack and low junction facing the junction
-        SetBrakes(true);
-        DriveForward(50, autoPower);
-        SetBrakes(true);
-        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.67);
-        sleep(1000);
-        serv0.setPower(0.18);
+        // SCRIPT FOR F2
 
-        for(int cycle=0; cycle<4; cycle++) {
-            // go to cone stacks
-            SpinRight(1840, autoPower);
-            DriveForward(200, autoPower);
-            // pick up cone
-            robot.lift.setTargetPosition(-450 + 50*cycle);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.67);
-            sleep(800);
-            serv0.setPower(-0.1);
-            robot.lift.setTargetPosition(Constants.elevatorPositionLow);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(1.0);
-            sleep(800); // idk which ones are fire-and-forget and stuff, let's just pretend
-                                // for now that the lift is at the top
-            robot.lift.setPower(0.001);
-            // go to junction
-            SpinRight(1840, autoPower);
-            DriveForward(200, autoPower);
-            // drop cone
-            serv0.setPower(0.18);
+        double autoPower = 0.40;
+        int sleepTime = 1;
+        serv0.setPower(-0.1);
+        sleep(sleepTime);
+        DriveForward(200, autoPower);
+        sleep(sleepTime);
+        SpinRight(910, autoPower); //face towards cones
+        sleep(sleepTime);
+        SetBrakes(true);
+        DriveForward(975, autoPower); //move robot to pad F3, we're basing all operations on row 3
+        sleep(sleepTime);
+        SetBrakes(true);
+        for (int i = 0; i < 1; i++){ //go back and forth between substation and high junction
+            StrafeLeft(1725, autoPower); //move to high pole
+            SetBrakes(true);
+            DepositCone(3); //drop cone on high pole (height 3)
+            StrafeRight(1725, autoPower); // Strafe back to F3
+            SetBrakes(true);
+            DriveForward(350, autoPower); //Go forward to pick up cone.
+            SetBrakes(true);
+            serv0.setPower(-0.1); //Pick up cone
+            sleep(500);
+            DriveReverse(350, autoPower); //Go back after picking up cone. We're now centered at F3 again.
+            SetBrakes(true);
         }
-
+        StrafeLeft(1200, autoPower);
         // Go to signal zone
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
             // Signal zone 1
-            DriveForward(2095, autoPower);
-            sleep(1);
+            DriveReverse(2095, autoPower);
             SetBrakes(true);
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
-            DriveForward(1048, autoPower);
-            sleep(1);
+            DriveReverse(1048, autoPower);
             SetBrakes(true);
         }else{
             //right trajectory- we're already here
