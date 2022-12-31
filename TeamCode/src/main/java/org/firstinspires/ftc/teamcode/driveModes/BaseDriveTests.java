@@ -42,10 +42,12 @@ public class BaseDriveTests extends LinearOpMode {
 
     int lTgtPos = 0;
     double robotAngle = 0;
+    double joystickAngle = 0;
+    double tgtAngle = 0;
     double xPower = 0;
     double yPower = 0;
     double rPower = 0;
-
+    double dirOffset = 0;
 
     @Override
     public void runOpMode() {
@@ -114,21 +116,30 @@ public class BaseDriveTests extends LinearOpMode {
 
         // Drivetrain code
 
+        //get side lengths of triangle
+        double a = 1;
+        double b = Math.pow((Math.pow(gamepad1.left_stick_x,2) + Math.pow(gamepad1.left_stick_y, 2)),0.5);
+        double c = Math.pow((Math.pow(gamepad1.left_stick_x-1,2) + Math.pow(gamepad1.left_stick_y-1, 2)),0.5);
+
+        joystickAngle = Math.acos((Math.pow(a,2)+Math.pow(b,2)-Math.pow(c,2))/2*a*b); // find joystick angle
+        if (gamepad1.left_stick_x < 0) {joystickAngle *= -1;} // because the above formula always outputs a positive angle
+
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        robotAngle = angles.firstAngle;
+        robotAngle = angles.firstAngle; // this is the angle between vertical, from driver's pov, and robot
+
+        tgtAngle = robotAngle + joystickAngle; //add angles
 
         telemetry.addData("Angle of robot: ", robotAngle);
 
-        if (robotAngle > 0) {yPower = robotAngle/-90 + 1;} // Calculate y power
-        else {yPower = robotAngle/90 + 1;}
+        if (tgtAngle > 0) {yPower = tgtAngle/-90 + 1;} // Calculate y power
+        else {yPower = tgtAngle/90 + 1;}
 
-        if(robotAngle > 90) {xPower = robotAngle/90 -2;} // Calculate x power
-        else if (robotAngle < -90) {xPower = robotAngle/90+2;}
-        else {xPower = robotAngle/90;}
+        if(tgtAngle > 90) {xPower = tgtAngle/90 -2;} // Calculate x power
+        else if (tgtAngle < -90) {xPower = tgtAngle/90+2;}
+        else {xPower = tgtAngle/90;}
 
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
-        else if (gamepad1.left_bumper) drivePower = 0.25;
 
         telemetry.addData("X power: ", xPower);
         telemetry.addData("Y power: ", yPower);
@@ -239,7 +250,7 @@ public class BaseDriveTests extends LinearOpMode {
                 });
 
         telemetry.addLine()
-                .addData("grvty", new Func<String>() {
+                .addData("grav", new Func<String>() {
                     @Override public String value() {
                         return gravity.toString();
                     }

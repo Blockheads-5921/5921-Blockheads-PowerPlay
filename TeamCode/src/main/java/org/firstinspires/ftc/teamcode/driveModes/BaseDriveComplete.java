@@ -45,7 +45,7 @@ public class BaseDriveComplete extends LinearOpMode {
         double drivePower = 0.25;
         if (gamepad1.right_bumper) drivePower = 1;
         DriveTrainBase(drivePower);
-        DriveMicroAdjust(0.4);
+        DriveMicroAdjust(0.1);
 
     }
     @Utility.Encapsulate
