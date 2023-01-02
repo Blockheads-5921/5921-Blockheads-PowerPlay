@@ -144,7 +144,7 @@ public class BaseDriveTests extends LinearOpMode {
         telemetry.addData("X power: ", xPower);
         telemetry.addData("Y power: ", yPower);
 
-        DriveTrainBase(xPower*gamepad1.left_stick_x,yPower*gamepad1.left_stick_y,-gamepad1.right_stick_x,drivePower);
+        DriveTrainBase(b*xPower,b*yPower,-gamepad1.right_stick_x,drivePower);
         DriveMicroAdjust(0.4);
         UpdateTelemetry();
     }
