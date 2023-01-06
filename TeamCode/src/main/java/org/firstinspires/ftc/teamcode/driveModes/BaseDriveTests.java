@@ -65,7 +65,7 @@ public class BaseDriveTests extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-        composeTelemetry();
+        // composeTelemetry();
 
         robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -116,20 +116,33 @@ public class BaseDriveTests extends LinearOpMode {
 
         // Drivetrain code
 
+        /*
         //get side lengths of triangle
         double a = 1;
         double b = Math.pow((Math.pow(gamepad1.left_stick_x,2) + Math.pow(gamepad1.left_stick_y, 2)),0.5);
         double c = Math.pow((Math.pow(gamepad1.left_stick_x-1,2) + Math.pow(gamepad1.left_stick_y-1, 2)),0.5);
 
+        telemetry.addData("Joystick pushed-ness: ", b);
+
         joystickAngle = Math.acos((Math.pow(a,2)+Math.pow(b,2)-Math.pow(c,2))/2*a*b); // find joystick angle
         if (gamepad1.left_stick_x < 0) {joystickAngle *= -1;} // because the above formula always outputs a positive angle
+
+         */
+
+        joystickAngle = Math.acos(gamepad1.left_stick_x/gamepad1.left_stick_y);
+        double joystickAmount = Math.pow((Math.pow(gamepad1.left_stick_x,2) + Math.pow(gamepad1.left_stick_y, 2)),0.5);
+
+
+        telemetry.addData("Angle of joystick: ", joystickAngle);
 
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         robotAngle = angles.firstAngle; // this is the angle between vertical, from driver's pov, and robot
 
-        tgtAngle = robotAngle + joystickAngle; //add angles
-
         telemetry.addData("Angle of robot: ", robotAngle);
+
+        tgtAngle = robotAngle - joystickAngle; //subtract angles
+
+        telemetry.addData("tgtAngle: ", tgtAngle);
 
         if (tgtAngle > 0) {yPower = tgtAngle/-90 + 1;} // Calculate y power
         else {yPower = tgtAngle/90 + 1;}
@@ -144,7 +157,7 @@ public class BaseDriveTests extends LinearOpMode {
         telemetry.addData("X power: ", xPower);
         telemetry.addData("Y power: ", yPower);
 
-        DriveTrainBase(b*xPower,b*yPower,-gamepad1.right_stick_x,drivePower);
+        DriveTrainBase(joystickAmount*xPower,joystickAmount*yPower,-gamepad1.right_stick_x,drivePower);
         DriveMicroAdjust(0.4);
         UpdateTelemetry();
     }

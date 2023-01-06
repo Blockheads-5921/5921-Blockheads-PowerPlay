@@ -74,7 +74,7 @@ public class BaseDriveComplete extends LinearOpMode {
 
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
-            // or over-retract
+        // or over-retract
         else if (liftPos > Constants.elevatorPositionBottom && (gamepad2.right_stick_y > 0)) robot.lift.setPower((liftPower) * 0.01);
         else robot.lift.setPower((liftPower - 0.001) * 0.80);
 
@@ -114,34 +114,7 @@ public class BaseDriveComplete extends LinearOpMode {
             robot.rb.setPower(-power);
         }
     }
-    private void MoveLiftTo(int jLevel) {
-        telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
-        telemetry.update();
-        int jCounts = true ? Constants.elevatorPositionBottom : null;
-        switch (jLevel) {
-            case -1:
-                jCounts = Constants.elevatorPositionBottom;
-            case 0:
-                jCounts = Constants.elevatorPositionBottom - 100; //ground junction
-            case 1:
-                jCounts = Constants.elevatorPositionLow;
-            case 2:
-                jCounts = Constants.elevatorPositionMid;
-            case 3:
-                jCounts = Constants.elevatorPositionTop;
-        }
-        robot.lift.setTargetPosition(jCounts);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.7);
-        telemetry.addData("Lift being given power and sent to ", jLevel);
-        telemetry.update();
-        sleep(jCounts * 750);
-        if (jLevel != -1) {
-            robot.lift.setTargetPosition(jCounts + 5);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.01);
-        }
-    }
+
     private void UpdateGripper() {
         if (gamepad2.left_trigger > 0.01) serv0.setPower(0.22 * gamepad2.left_trigger - 0);
         else if  (gamepad2.right_trigger > 0.01) serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
