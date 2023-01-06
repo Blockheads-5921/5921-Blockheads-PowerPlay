@@ -55,8 +55,8 @@ public class BaseDriveComplete extends LinearOpMode {
         double directionR = -Math.pow(gamepad1.right_stick_x, 1); // Turn
         double liftPower = Math.pow(gamepad2.right_stick_y, 1); // Lift
         //dead zones
-        if (gamepad1.left_stick_x < 0.2 && gamepad1.left_stick_x > -0.2) {directionX = 0;}
-        if (gamepad1.left_stick_y < 0.2 && gamepad1.left_stick_y > -0.2) {directionY = 0;}
+        if (gamepad1.left_stick_x < 2 || gamepad1.left_stick_x > 2) directionX = 0;
+        if (gamepad1.left_stick_y < 0.2 || gamepad1.left_stick_y > -0.2) directionY = 0;
         int liftPos = robot.lift.getCurrentPosition();
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
@@ -128,4 +128,3 @@ public class BaseDriveComplete extends LinearOpMode {
         telemetry.update();
     }
 }
-
