@@ -172,15 +172,15 @@ public class F5A2aTagAuto extends LinearOpMode
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
-            // Signal zone 1
-            DriveReverse(2095, autoPower);
-            SetBrakes(true);
+            //left trajectory- we're already here
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
             DriveReverse(1048, autoPower);
             SetBrakes(true);
         }else{
-            //right trajectory- we're already here
+            // Signal zone 3
+            DriveReverse(2095, autoPower);
+            SetBrakes(true);
         }
         //maybe put down final cone on nearest pole to signal zone?
 
