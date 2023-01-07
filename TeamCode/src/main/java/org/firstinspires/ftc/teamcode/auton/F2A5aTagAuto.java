@@ -161,7 +161,7 @@ public class F2A5aTagAuto extends LinearOpMode
         SpinRight(910, autoPower); //face towards cones
         sleep(sleepTime);
         SetBrakes(true);
-        DriveForward(975, autoPower); //move robot to pad F3, we're basing all operations on row 3
+        DriveForward(950, autoPower); //move robot to pad F3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
         for (int i = 0; i < 1; i++){ //go back and forth between substation and high junction
@@ -180,7 +180,7 @@ public class F2A5aTagAuto extends LinearOpMode
             SetBrakes(true);
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
-            DriveReverse(1048, autoPower);
+            DriveReverse(1000, autoPower);
             SetBrakes(true);
         }else{
             //right trajectory- we're already here
@@ -467,7 +467,7 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(100,0.15);
+        DriveForward(75,0.15);
         //Release cone
         serv0.setPower(0.18);
         //Back up

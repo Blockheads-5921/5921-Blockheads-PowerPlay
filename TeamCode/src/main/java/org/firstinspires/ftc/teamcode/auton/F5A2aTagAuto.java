@@ -162,7 +162,7 @@ public class F5A2aTagAuto extends LinearOpMode
         sleep(sleepTime);
         SetBrakes(true);
         for (int i = 0; i < 1; i++) { //go back and forth between substation and high junction
-            StrafeRight(1715, autoPower); //move to high pole
+            StrafeRight(1675, autoPower); //move to high pole
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
         }

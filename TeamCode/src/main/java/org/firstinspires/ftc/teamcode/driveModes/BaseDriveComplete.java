@@ -42,7 +42,7 @@ public class BaseDriveComplete extends LinearOpMode {
     }
 
     private void UpdatePlayers() {
-        double drivePower = 0.25;
+        double drivePower = 0.4;
         if (gamepad1.right_bumper) drivePower = 1;
         DriveTrainBase(drivePower);
         DriveMicroAdjust(0.1);
@@ -54,9 +54,6 @@ public class BaseDriveComplete extends LinearOpMode {
         double directionY = Math.pow(gamepad1.left_stick_y, 1); // Forward
         double directionR = -Math.pow(gamepad1.right_stick_x, 1); // Turn
         double liftPower = Math.pow(gamepad2.right_stick_y, 1); // Lift
-        //dead zones
-        if (gamepad1.left_stick_x < 2 || gamepad1.left_stick_x > 2) directionX = 0;
-        if (gamepad1.left_stick_y < 0.2 || gamepad1.left_stick_y > -0.2) directionY = 0;
         int liftPos = robot.lift.getCurrentPosition();
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
@@ -74,9 +71,9 @@ public class BaseDriveComplete extends LinearOpMode {
 
         // Make sure we're not letting lift over-extend...
         if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
-        // or over-retract
+            // or over-retract
         else if (liftPos > Constants.elevatorPositionBottom && (gamepad2.right_stick_y > 0)) robot.lift.setPower((liftPower) * 0.01);
-        else robot.lift.setPower((liftPower - 0.001) * 0.80);
+        else robot.lift.setPower((liftPower - 0.001) * 0.90);
 
     }
     private void DriveMicroAdjust(double power) {
@@ -116,7 +113,7 @@ public class BaseDriveComplete extends LinearOpMode {
     }
 
     private void UpdateGripper() {
-        if (gamepad2.left_trigger > 0.01) serv0.setPower(0.22 * gamepad2.left_trigger - 0);
+        if (gamepad2.left_trigger > 0.01) serv0.setPower(0.18 * gamepad2.left_trigger - 0);
         else if  (gamepad2.right_trigger > 0.01) serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
     }
     private void UpdateTelemetry() {

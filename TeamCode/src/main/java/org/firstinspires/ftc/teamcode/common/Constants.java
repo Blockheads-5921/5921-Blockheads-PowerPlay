@@ -7,6 +7,5 @@ public class Constants {
     public static final int elevatorPositionTop = -3060; //High junction
     public static final int elevatorPositionMid = -2050; //Medium junction
     public static final int elevatorPositionLow = -1250; //Low junction
-    public static final int elevatorPositionBottom = -20; // changed from -10 to -20
-    public final int elevatorAcrossDrop = -2000;
+    public static final int elevatorPositionBottom = -40; //bottom
 }
