@@ -104,7 +104,6 @@ public class F2A5aTagAuto extends LinearOpMode
          * This REPLACES waitForStart!
          */
 
-        //it'd be pretty cool to be able to move diagonally
 
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
@@ -147,49 +146,64 @@ public class F2A5aTagAuto extends LinearOpMode
             telemetry.update();
         }
 
-        /* Actually do something useful */
-
         // SCRIPT FOR F2
 
 
-        double autoPower = 0.40;
-        int sleepTime = 1;
-        serv0.setPower(-0.1);
-        sleep(sleepTime);
-        DriveForward(200, autoPower);
-        sleep(sleepTime);
-        SpinRight(910, autoPower); //face towards cones
-        sleep(sleepTime);
+        // we start the robot centered
         SetBrakes(true);
-        DriveForward(950, autoPower); //move robot to pad F3, we're basing all operations on row 3
-        sleep(sleepTime);
-        SetBrakes(true);
-        for (int i = 0; i < 1; i++){ //go back and forth between substation and high junction
-            StrafeLeft(1715, autoPower); //move to high pole
-            SetBrakes(true);
-            DepositCone(3); //drop cone on high pole (height 3)
+        double autoPower = 40;
+        DriveForward(2100, autoPower); //we're now centered at d2
+
+        //line up with pole, drop cone, and lower lift
+        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
+        StrafeRight(600, autoPower); //we're in front of high junction
+        DriveForward(100, 20);
+        serv0.setPower(0.17);
+        DriveReverse(100,20);
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.80); //be nice to have the power such that the string stays taut
+
+        for (int i = 0; i<2; i++) {
+            //face and drive to cone stack
+            SpinLeft(920, autoPower);
+            DriveForward(1575, autoPower);
+            //grab cone
+            serv0.setPower(-0.1);
+            sleep(100);
+            //raise lift
+            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.8);
+            // go to high pole
+            DriveReverse(1575, autoPower);
+            SpinRight(920, autoPower);
+            //drop cone and lower lift
+            DriveForward(100, 20);
+            serv0.setPower(0.17);
+            DriveReverse(100,20);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.80);
         }
-        StrafeLeft(400, autoPower);
-        // Go to signal zone
+        // we are now in centered on the tile in front of the high junction, facing away from our substation.
+
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
-            // Signal zone 1
-            DriveReverse(2095, autoPower);
-            SetBrakes(true);
+            StrafeLeft(1800,70); //high speed because we don't really need precision
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
-            DriveReverse(1000, autoPower);
-            SetBrakes(true);
+            StrafeLeft(600, 70);
         }else{
-            //right trajectory- we're already here
+            // Signal zone 3
+            StrafeRight(600, 70);
         }
-        //maybe put down final cone on nearest pole to signal zone?
 
 
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
     }
 
 
@@ -429,22 +443,7 @@ public class F2A5aTagAuto extends LinearOpMode
         }
     }
 
-    private void PickUpCone (int coneHeight) {
-        robot.lift.setTargetPosition(coneHeight);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.67);
-        serv0.setPower(-0.1);
-        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(1.0);
-        sleep(1); // idk which ones are fire-and-forget and stuff, let's just pretend
-                            // for now that the lift is at the top
-        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.lift.setPower(0);
-
-    }
-
-    private void DepositCone(int junctionLevel){
+    private void DepositCone(int junctionLevel, int downLiftHeight){
         //assumes lift is at bottom
         int targetPos = 0;
         switch (junctionLevel) {
@@ -474,7 +473,8 @@ public class F2A5aTagAuto extends LinearOpMode
         DriveReverse(75,0.30);
         sleep(250);
         //lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
+        robot.lift.setTargetPosition(downLiftHeight); // The lift's mechanism might not be enough to hold it at downLiftHeight,
+                                                      // in which case we have to do a bunch of annoying stuff
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
         sleep(750);
