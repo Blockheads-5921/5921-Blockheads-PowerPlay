@@ -151,40 +151,43 @@ public class F2A5aTagAuto extends LinearOpMode
 
         // we start the robot centered
         SetBrakes(true);
-        double autoPower = 40;
-        DriveForward(2100, autoPower); //we're now centered at d2
-
-        //line up with pole, drop cone, and lower lift
+        double autoPower = 0.40;
+        serv0.setPower(-0.1);
+        sleep(200);
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
+        DriveForward(2600, autoPower); //we're now centered at d2
+        DriveReverse(350, autoPower);
+        //line up with pole, drop cone, and lower lift
         StrafeRight(600, autoPower); //we're in front of high junction
-        DriveForward(100, 20);
+        DriveForward(100, 20); //might not need these bc raising lift while drivingS
+        sleep(300);
         serv0.setPower(0.17);
-        DriveReverse(100,20);
+        DriveReverse(150,20);
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.80); //be nice to have the power such that the string stays taut
 
         for (int i = 0; i<2; i++) {
             //face and drive to cone stack
-            SpinLeft(920, autoPower);
-            DriveForward(1575, autoPower);
+            SpinLeft(940, autoPower);
+            DriveForward(1600, autoPower);
             //grab cone
             serv0.setPower(-0.1);
-            sleep(100);
+            sleep(300);
             //raise lift
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // go to high pole
-            DriveReverse(1575, autoPower);
+            DriveReverse(1600, autoPower);
             SpinRight(920, autoPower);
             //drop cone and lower lift
-            DriveForward(100, 20);
+            DriveForward(100, 0.20);
             serv0.setPower(0.17);
-            DriveReverse(100,20);
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
+            DriveReverse(100,0.20);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300-i*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.80);
         }
