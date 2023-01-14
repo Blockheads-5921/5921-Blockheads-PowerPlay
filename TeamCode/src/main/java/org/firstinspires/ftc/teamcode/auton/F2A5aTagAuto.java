@@ -156,21 +156,21 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveForward(2300, autoPower);
-        StrafeLeft(550, autoPower); //we're now centered at d2
+        DriveForward(2250, autoPower);
+        StrafeLeft(540, autoPower); //we're now centered at d2
         //line up with pole, and drop cone
-        sleep(300);
+        sleep(500);
         serv0.setPower(0.17);
 
-        for (int i = 0; i<3; i++) {
+        for (int i = 0; i<2; i++) {
             //Face cone stack
             SpinLeft(920, autoPower);
             //Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-500+i*150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             //drive to cone stack
-            DriveForward(1750, autoPower);
+            DriveForward(1800, autoPower);
             //grab cone
             serv0.setPower(-0.1);
             sleep(300);
