@@ -148,30 +148,29 @@ public class F2A5aTagAuto extends LinearOpMode
 
         // SCRIPT FOR F2
 
-        // we start the robot centered
         SetBrakes(true);
         double autoPower = 0.40;
         serv0.setPower(-0.1);
         sleep(200);
+        StrafeRight(1200, autoPower);
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveForward(2650, autoPower);
-        DriveReverse(350, autoPower); //we're now centered at d2
+        DriveForward(2300, autoPower);
+        StrafeLeft(550, autoPower); //we're now centered at d2
         //line up with pole, and drop cone
-        StrafeRight(600, autoPower); //we're in front of high junction
         sleep(300);
         serv0.setPower(0.17);
 
         for (int i = 0; i<3; i++) {
             //Face cone stack
-            SpinLeft(940, autoPower);
+            SpinLeft(920, autoPower);
             //Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-600+i*100);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-500+i*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             //drive to cone stack
-            DriveForward(1600, autoPower);
+            DriveForward(1750, autoPower);
             //grab cone
             serv0.setPower(-0.1);
             sleep(300);
@@ -180,14 +179,15 @@ public class F2A5aTagAuto extends LinearOpMode
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // go to high pole
-            DriveReverse(1600, autoPower);
+            DriveReverse(1750, autoPower);
             SpinRight(920, autoPower);
             //drop cone
+            sleep(300);
             serv0.setPower(0.17);
 
         }
         // we are now in centered on the tile in front of the high junction, facing away from our substation.
-
+        DriveForward(100, autoPower);
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
