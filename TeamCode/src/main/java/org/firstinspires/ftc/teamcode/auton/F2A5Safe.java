@@ -42,8 +42,8 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Robot: F5/A2 Apriltag auto", group = "Robot")
-public class F5A2aTagAuto extends LinearOpMode
+@Autonomous(name = "F2/A5 Safer auto", group = "Robot")
+public class F2A5Safe extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -104,11 +104,10 @@ public class F5A2aTagAuto extends LinearOpMode
          * This REPLACES waitForStart!
          */
 
-        //it'd be pretty cool to be able to move diagonally
 
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            if(currentDetections.size() != 0) {
+            if(currentDetections.size() != 0)    {
                 boolean tagFound = false;
                 for(AprilTagDetection tag : currentDetections) {
                     if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
@@ -143,67 +142,47 @@ public class F5A2aTagAuto extends LinearOpMode
         }
         else
         {
-            telemetry.addLine("Lament! We saw no tag!");
+            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
 
-        // SCRIPT FOR F5
+        // SCRIPT FOR F2
 
-        SetBrakes(true);
         double autoPower = 0.40;
+        int sleepTime = 1;
         serv0.setPower(-0.1);
-        sleep(200);
-        StrafeLeft(1200, autoPower);
-        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
-        DriveForward(2250, autoPower);
-        StrafeRight(540, autoPower); //we're now centered at d2
-        //line up with pole, and drop cone
-        sleep(500);
-        serv0.setPower(0.17);
-
-        for (int i = 0; i<2; i++) {
-            //Face cone stack
-            SpinRight(900, autoPower);
-            //Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            //drive to cone stack
-            DriveForward(1800, autoPower);
-            //grab cone
-            serv0.setPower(-0.1);
-            sleep(300);
-            //raise lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            // go to high pole
-            DriveReverse(1750, autoPower);
-            SpinLeft(920, autoPower);
-            //drop cone
-            sleep(300);
-            serv0.setPower(0.17);
-
+        sleep(sleepTime);
+        DriveForward(200, autoPower);
+        sleep(sleepTime);
+        SpinRight(910, autoPower); //face towards cones
+        sleep(sleepTime);
+        SetBrakes(true);
+        DriveForward(950, autoPower); //move robot to pad F3, we're basing all operations on row 3
+        sleep(sleepTime);
+        SetBrakes(true);
+        for (int i = 0; i < 1; i++){ //go back and forth between substation and high junction
+            StrafeLeft(1715, autoPower); //move to high pole
+            SetBrakes(true);
+            DepositCone(3); //drop cone on high pole (height 3)
         }
-        // we are now in centered on the tile in front of the high junction, facing away from our substation.
-        DriveForward(100, autoPower);
+        StrafeLeft(400, autoPower);
+        // Go to signal zone
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
-            StrafeLeft(600,70); //high speed because we don't really need precision
+            // Signal zone 1
+            DriveReverse(2095, autoPower);
+            SetBrakes(true);
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
-            StrafeRight(600, 70);
+            DriveReverse(1000, autoPower);
+            SetBrakes(true);
         }else{
-            // Signal zone 3
-            StrafeRight(1800, 70);
+            //right trajectory- we're already here
         }
 
-
-    }
+        }
 
 
     void tagToTelemetry(AprilTagDetection detection)
@@ -442,21 +421,6 @@ public class F5A2aTagAuto extends LinearOpMode
         }
     }
 
-    private void PickUpCone (int coneHeight) {
-        robot.lift.setTargetPosition(coneHeight);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.67);
-        serv0.setPower(-0.1);
-        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(1.0);
-        sleep(1); // idk which ones are fire-and-forget and stuff, let's just pretend
-                            // for now that the lift is at the top
-        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.lift.setPower(0);
-
-    }
-
     private void DepositCone(int junctionLevel){
         //assumes lift is at bottom
         int targetPos = 0;
@@ -480,14 +444,15 @@ public class F5A2aTagAuto extends LinearOpMode
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(100,0.15);
+        DriveForward(75,0.15);
         //Release cone
         serv0.setPower(0.18);
         //Back up
         DriveReverse(75,0.30);
         sleep(250);
         //lower arm
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom); // The lift's mechanism might not be enough to hold it at downLiftHeight,
+                                                      // in which case we have to do a bunch of annoying stuff
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
         sleep(750);
