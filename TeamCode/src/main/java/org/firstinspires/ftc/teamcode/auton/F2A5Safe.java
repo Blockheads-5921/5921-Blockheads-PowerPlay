@@ -42,7 +42,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "F2/A5 Apriltag auto", group = "Robot")
+@Autonomous(name = "F2/A5 Safer auto", group = "Robot")
 public class F2A5Safe extends LinearOpMode
 {
     OpenCvCamera camera;
