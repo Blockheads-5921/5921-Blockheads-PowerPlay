@@ -23,22 +23,20 @@ package org.firstinspires.ftc.teamcode.auton;
 import android.drm.DrmInfoEvent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
-import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.Constants;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
@@ -151,9 +149,8 @@ public class F2A5aTagAuto extends LinearOpMode
 
         // we start the robot centered
         SetBrakes(true);
-        double autoPower = 40;
-        DriveForward(2100, autoPower); //we're now centered at d2
-
+        double autoPower = 0.40;
+        DriveForward(2300, autoPower); //we're now centered at d2
         //line up with pole, drop cone, and lower lift
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -172,7 +169,7 @@ public class F2A5aTagAuto extends LinearOpMode
             DriveForward(1575, autoPower);
             //grab cone
             serv0.setPower(-0.1);
-            sleep(100);
+            sleep(200);
             //raise lift
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -181,9 +178,9 @@ public class F2A5aTagAuto extends LinearOpMode
             DriveReverse(1575, autoPower);
             SpinRight(920, autoPower);
             //drop cone and lower lift
-            DriveForward(100, 20);
+            DriveForward(100, .20);
             serv0.setPower(0.17);
-            DriveReverse(100,20);
+            DriveReverse(100,.20);
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.80);
