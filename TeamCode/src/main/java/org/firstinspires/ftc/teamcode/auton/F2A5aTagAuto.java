@@ -148,7 +148,6 @@ public class F2A5aTagAuto extends LinearOpMode
 
         // SCRIPT FOR F2
 
-
         // we start the robot centered
         SetBrakes(true);
         double autoPower = 0.40;
@@ -157,21 +156,21 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveForward(2600, autoPower); //we're now centered at d2
-        DriveReverse(350, autoPower);
-        //line up with pole, drop cone, and lower lift
+        DriveForward(2650, autoPower);
+        DriveReverse(350, autoPower); //we're now centered at d2
+        //line up with pole, and drop cone
         StrafeRight(600, autoPower); //we're in front of high junction
-        DriveForward(100, 20); //might not need these bc raising lift while drivingS
         sleep(300);
         serv0.setPower(0.17);
-        DriveReverse(150,20);
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.80); //be nice to have the power such that the string stays taut
 
-        for (int i = 0; i<2; i++) {
-            //face and drive to cone stack
+        for (int i = 0; i<3; i++) {
+            //Face cone stack
             SpinLeft(940, autoPower);
+            //Lower lift
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-600+i*100);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.8);
+            //drive to cone stack
             DriveForward(1600, autoPower);
             //grab cone
             serv0.setPower(-0.1);
@@ -183,13 +182,9 @@ public class F2A5aTagAuto extends LinearOpMode
             // go to high pole
             DriveReverse(1600, autoPower);
             SpinRight(920, autoPower);
-            //drop cone and lower lift
-            DriveForward(100, 0.20);
+            //drop cone
             serv0.setPower(0.17);
-            DriveReverse(100,0.20);
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300-i*150);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.80);
+
         }
         // we are now in centered on the tile in front of the high junction, facing away from our substation.
 

@@ -70,9 +70,9 @@ public class BaseDriveComplete extends LinearOpMode {
          */
 
         // Make sure we're not letting lift over-extend...
-        if (liftPos < Constants.elevatorPositionTop) {robot.lift.setPower((liftPower) * 0.1);} // YOU WILL DELETE MY CURLY BRACKETS OVER MY DEAD BODY!!!
-            // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom && (gamepad2.right_stick_y > 0)) {robot.lift.setPower((liftPower) * 0.01);}
+        if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {robot.lift.setPower((liftPower) * 0.1 - -0.001);} // YOU WILL DELETE MY CURLY BRACKETS OVER MY DEAD BODY!!!
+        // or over-retract
+        else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {robot.lift.setPower((liftPower) * 0.01);}
         else {robot.lift.setPower((liftPower - 0.001) * 0.90);}
 
     }
@@ -123,7 +123,7 @@ public class BaseDriveComplete extends LinearOpMode {
         telemetry.addData("Arm Position", robot.lift.getCurrentPosition());
         telemetry.addData("g2.L", gamepad2.right_stick_y);
         if (gamepad1.a && gamepad2.a) {
-            telemetry.addData("Players high fived!", "");
+            telemetry.addLine("Players high fived!");
         }
         telemetry.update();
     }
