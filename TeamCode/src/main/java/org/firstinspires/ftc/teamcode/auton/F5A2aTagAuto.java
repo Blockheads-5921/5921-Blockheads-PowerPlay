@@ -149,44 +149,60 @@ public class F5A2aTagAuto extends LinearOpMode
 
         // SCRIPT FOR F5
 
+        SetBrakes(true);
         double autoPower = 0.40;
-        int sleepTime = 1;
         serv0.setPower(-0.1);
-        sleep(sleepTime);
-        DriveForward(200, autoPower);
-        sleep(sleepTime);
-        SpinLeft(910, autoPower); //face towards cones
-        sleep(sleepTime);
-        SetBrakes(true);
-        DriveForward(975, autoPower); //move robot to pad F3, we're basing all operations on row 3
-        sleep(sleepTime);
-        SetBrakes(true);
-        for (int i = 0; i < 1; i++) { //go back and forth between substation and high junction
-            StrafeRight(1675, autoPower); //move to high pole
-            SetBrakes(true);
-            DepositCone(3); //drop cone on high pole (height 3)
+        sleep(200);
+        StrafeLeft(1200, autoPower);
+        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
+        DriveForward(2250, autoPower);
+        StrafeRight(540, autoPower); //we're now centered at d2
+        //line up with pole, and drop cone
+        sleep(500);
+        serv0.setPower(0.17);
+
+        for (int i = 0; i<2; i++) {
+            //Face cone stack
+            SpinRight(900, autoPower);
+            //Lower lift
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.8);
+            //drive to cone stack
+            DriveForward(1800, autoPower);
+            //grab cone
+            serv0.setPower(-0.1);
+            sleep(300);
+            //raise lift
+            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.8);
+            // go to high pole
+            DriveReverse(1750, autoPower);
+            SpinLeft(920, autoPower);
+            //drop cone
+            sleep(300);
+            serv0.setPower(0.17);
+
         }
-        StrafeRight(400, autoPower);
-        // Go to signal zone
+        // we are now in centered on the tile in front of the high junction, facing away from our substation.
+        DriveForward(100, autoPower);
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
         }else if(tagOfInterest.id == LEFT){
-            //left trajectory- we're already here
+            StrafeLeft(600,70); //high speed because we don't really need precision
         }else if(tagOfInterest.id == MIDDLE){
             // Signal zone 2
-            DriveReverse(1048, autoPower);
-            SetBrakes(true);
+            StrafeRight(600, 70);
         }else{
             // Signal zone 3
-            DriveReverse(2095, autoPower);
-            SetBrakes(true);
+            StrafeRight(1800, 70);
         }
-        //maybe put down final cone on nearest pole to signal zone?
 
 
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
     }
 
 
