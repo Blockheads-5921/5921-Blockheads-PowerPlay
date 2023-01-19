@@ -78,6 +78,7 @@ public class F2A5aTagAuto extends LinearOpMode
     public void runOpMode() {
         robot.init(hardwareMap);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "log920"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
