@@ -23,22 +23,20 @@ package org.firstinspires.ftc.teamcode.auton;
 import android.drm.DrmInfoEvent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
-import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.common.Constants;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.common.Constants;
+import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
@@ -149,49 +147,47 @@ public class F2A5aTagAuto extends LinearOpMode
 
         // SCRIPT FOR F2
 
+
+        // we start the robot centered
         SetBrakes(true);
         double autoPower = 0.40;
-        serv0.setPower(-0.1);
-        sleep(200);
-        StrafeRight(1200, autoPower);
+        DriveForward(2300, autoPower); //we're now centered at d2
+        //line up with pole, drop cone, and lower lift
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveForward(2250, autoPower);
-        StrafeLeft(540, autoPower); //we're now centered at d2
-        //line up with pole, and drop cone
-        sleep(500);
+        StrafeRight(600, autoPower); //we're in front of high junction
+        DriveForward(100, 20);
         serv0.setPower(0.17);
+        DriveReverse(100,20);
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.80); //be nice to have the power such that the string stays taut
 
         for (int i = 0; i<2; i++) {
-            //Face cone stack
+            //face and drive to cone stack
             SpinLeft(920, autoPower);
-            //Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            //drive to cone stack
-            DriveForward(1800, autoPower);
+            DriveForward(1575, autoPower);
             //grab cone
             serv0.setPower(-0.1);
-            sleep(300);
+            sleep(200);
             //raise lift
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // go to high pole
-            DriveReverse(1750, autoPower);
+            DriveReverse(1575, autoPower);
             SpinRight(920, autoPower);
-            //drop cone
-            sleep(300);
+            //drop cone and lower lift
+            DriveForward(100, .20);
             serv0.setPower(0.17);
-
+            DriveReverse(100,.20);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-300);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.80);
         }
         // we are now in centered on the tile in front of the high junction, facing away from our substation.
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
-        DriveForward(100, autoPower);
+
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
