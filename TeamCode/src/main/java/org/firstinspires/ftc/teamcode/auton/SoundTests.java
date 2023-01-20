@@ -85,7 +85,7 @@ public class SoundTests extends LinearOpMode {
     public void runOpMode() {
 
         // Determine Resource IDs for sounds built into the RC application.
-        int beepSoundID = hardwareMap.appContext.getResources().getIdentifier("beep", "raw", hardwareMap.appContext.getPackageName());
+        int beepSoundID = hardwareMap.appContext.getResources().getIdentifier("vineboom", "raw", hardwareMap.appContext.getPackageName());
 
         // Determine if sound resources are found.
         // Note: Preloading is NOT required, but it's a good way to verify all your sounds are available before you run.

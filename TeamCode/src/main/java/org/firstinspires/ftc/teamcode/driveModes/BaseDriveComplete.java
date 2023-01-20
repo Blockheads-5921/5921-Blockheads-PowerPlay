@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.driveModes;
+import com.acmerobotics.roadrunner.drive.Drive;
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.checkerframework.checker.signedness.qual.Constant;
@@ -22,6 +25,11 @@ public class BaseDriveComplete extends LinearOpMode {
     private final Button lifterButton = new Button();
     private final Button lifterBottomButton = new Button();
     private final boolean toggleButton = true;
+    // get goofy sounds
+    int vineBoomSoundID = hardwareMap.appContext.getResources().getIdentifier("vineboom", "raw", hardwareMap.appContext.getPackageName());
+    int runningSoundID = hardwareMap.appContext.getResources().getIdentifier("running", "raw", hardwareMap.appContext.getPackageName());
+    int slidingSoundID = hardwareMap.appContext.getResources().getIdentifier("slide", "raw", hardwareMap.appContext.getPackageName());
+    boolean soundPlayed = false;
 
     @Override
     public void runOpMode() {
@@ -36,46 +44,41 @@ public class BaseDriveComplete extends LinearOpMode {
         while (opModeIsActive()) loop1();
     }
     private void loop1() {
-        UpdateGripper();
-        UpdatePlayers();
+        double drivePower = 0.4;
+        if (gamepad1.right_bumper) drivePower = 1;
+
+        int liftPos = robot.lift.getCurrentPosition();
+
+        robot.lf.setPower((gamepad1.left_stick_y + -gamepad1.right_stick_x - gamepad1.left_stick_x) * drivePower);
+        robot.rf.setPower((-gamepad1.left_stick_y + -gamepad1.right_stick_x - gamepad1.left_stick_x) * drivePower);
+        robot.lb.setPower((gamepad1.left_stick_y + -gamepad1.right_stick_x + gamepad1.left_stick_x) * drivePower);
+        robot.rb.setPower((-gamepad1.left_stick_y + -gamepad1.right_stick_x + gamepad1.left_stick_x) * drivePower);
+
+        // Make sure we're not letting lift over-extend...
+        if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {robot.lift.setPower((gamepad2.left_stick_y) * 0.1 - -0.001);}
+        // or over-retract
+        else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {robot.lift.setPower((gamepad2.left_stick_y) * 0.01);}
+        else {robot.lift.setPower((gamepad2.left_stick_y - 0.001) * 0.90);} // all this works because both the lift and left_stick_y are inverted
+
+        if (gamepad2.right_stick_y < 0 && !soundPlayed) {
+            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, vineBoomSoundID);
+            soundPlayed = true;
+        }
+
+        if (gamepad2.left_trigger > 0.01) {
+            serv0.setPower(0.18 * gamepad2.left_trigger - 0);
+            if (!soundPlayed) {
+                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, vineBoomSoundID);
+                soundPlayed = true;
+            }
+        } else if (gamepad2.right_trigger > 0.01) {serv0.setPower(-0.1 * gamepad2.right_trigger + 0);}
+
+        if (gamepad2.right_stick_y > 0 & gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0) {soundPlayed = false;} //consider different soundPlayeds for different sounds?
+
+        DriveMicroAdjust(0.2);
         UpdateTelemetry();
     }
 
-    private void UpdatePlayers() {
-        double drivePower = 0.4;
-        if (gamepad1.right_bumper) drivePower = 1;
-        DriveTrainBase(drivePower);
-        DriveMicroAdjust(0.1);
-
-    }
-    @Utility.Encapsulate
-    private void DriveTrainBase(double drivePower) {
-        double directionX = Math.pow(gamepad1.left_stick_x, 1); // Strafe
-        double directionY = Math.pow(gamepad1.left_stick_y, 1); // Forward
-        double directionR = -Math.pow(gamepad1.right_stick_x, 1); // Turn
-        double liftPower = Math.pow(gamepad2.right_stick_y, 1); // Lift
-        int liftPos = robot.lift.getCurrentPosition();
-
-        robot.lf.setPower((directionY + directionR - directionX) * drivePower);
-        robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
-        robot.lb.setPower((directionY + directionR + directionX) * drivePower);
-        robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
-
-        /*
-                if (gamepad2.y == true) {MoveLiftTo(3); telemetry.addLine("Button y pressed");}
-        if (gamepad2.x == true) {MoveLiftTo(2);}
-        if (gamepad2.a == true) {MoveLiftTo(1);}
-        if (gamepad2.b == true) {MoveLiftTo(0);}
-        if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {MoveLiftTo(-1);}
-         */
-
-        // Make sure we're not letting lift over-extend...
-        if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {robot.lift.setPower((liftPower) * 0.1 - -0.001);} // YOU WILL DELETE MY CURLY BRACKETS OVER MY DEAD BODY!!!
-        // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {robot.lift.setPower((liftPower) * 0.01);}
-        else {robot.lift.setPower((liftPower - 0.001) * 0.90);}
-
-    }
     private void DriveMicroAdjust(double power) {
         if (gamepad1.dpad_up) {
             robot.lf.setPower(-power);
@@ -112,10 +115,6 @@ public class BaseDriveComplete extends LinearOpMode {
         }
     }
 
-    private void UpdateGripper() {
-        if (gamepad2.left_trigger > 0.01) serv0.setPower(0.18 * gamepad2.left_trigger - 0);
-        else if  (gamepad2.right_trigger > 0.01) serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
-    }
     private void UpdateTelemetry() {
         telemetry.addData("g1.X", gamepad1.left_stick_x);
         telemetry.addData("g1.Y", -gamepad1.left_stick_y);
