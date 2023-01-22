@@ -1,0 +1,2 @@
+*.gradle linguist-language=Gradle-Configuration
+*.yml linguist-detectable
