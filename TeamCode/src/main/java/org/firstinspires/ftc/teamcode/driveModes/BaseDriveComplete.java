@@ -29,18 +29,19 @@ public class BaseDriveComplete extends LinearOpMode {
     int vineBoomSoundID = hardwareMap.appContext.getResources().getIdentifier("vineboom", "raw", hardwareMap.appContext.getPackageName());
     int runningSoundID = hardwareMap.appContext.getResources().getIdentifier("running", "raw", hardwareMap.appContext.getPackageName());
     int slidingSoundID = hardwareMap.appContext.getResources().getIdentifier("slide", "raw", hardwareMap.appContext.getPackageName());
-    boolean soundPlayed = false;
+    boolean soundPlayed = true;
 
     @Override
     public void runOpMode() {
+        runtime.reset();
         serv0 = hardwareMap.get(CRServo.class, "serv0");
         robot.init(hardwareMap);
-        telemetry.addData("Say", "Hello Driver");
-        runtime.reset();
         robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, runningSoundID);
 
         waitForStart();
+
         while (opModeIsActive()) loop1();
     }
     private void loop1() {
@@ -61,7 +62,7 @@ public class BaseDriveComplete extends LinearOpMode {
         else {robot.lift.setPower((gamepad2.left_stick_y - 0.001) * 0.90);} // all this works because both the lift and left_stick_y are inverted
 
         if (gamepad2.right_stick_y < 0 && !soundPlayed) {
-            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, vineBoomSoundID);
+            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, slidingSoundID);
             soundPlayed = true;
         }
 
