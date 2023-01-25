@@ -4,7 +4,7 @@ also talk to Luke or Leo if you have any questions about anything.
 Some questions that I had when starting out, with answers:
 
 Q: Where are the actual programs that get run?
-A: Teamcode/java/org/firstinspires/ftc/teamcode
+A: Teamcode/src/main/java/org/firstinspires/ftc/teamcode, take a look at the readme there
 
 Q: What's an opmode?
 A: Basically, a program for the robot to run.
@@ -13,7 +13,7 @@ Q: Where is the actual code that gets run, or the "main" method?
 A: It doesn't really matter, just put your stuff in a file in teamcode.
 
 Q: Where are the motors and things defined?
-A: For this codebase, Teamcode/java/org/firstinspires/ftc/teamcode/common/HardwareDrive.java
+A: For this codebase, Teamcode/src/main/java/org/firstinspires/ftc/teamcode/common/HardwareDrive.java
 
 Q: What do I need to add to Android Studio to program for FTC?
-A: IdeaVim, or an equivalent. You can install IdeaVim in File>Settings>Plugins.
+A: IdeaVim, or an equivalent (not really). You can install IdeaVim in File>Settings>Plugins.
