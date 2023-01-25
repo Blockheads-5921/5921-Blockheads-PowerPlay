@@ -1,4 +1,0 @@
-*.gradle linguist-detectable
-*.yml linguist-detectable
-./.github/*.yml linguist-detectable
-*.md linguist-detectable
