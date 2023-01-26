@@ -1,0 +1,2 @@
+*.gradle linguist-detectable
+*.md linguist-detectable
