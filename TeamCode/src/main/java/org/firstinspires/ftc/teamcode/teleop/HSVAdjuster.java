@@ -56,7 +56,7 @@ public class HSVAdjuster extends LinearOpMode {
         } else if (gamepad1.x) {
             HSVMode = 1;
         } else if (gamepad1.a) {
-            HSVmode = 2;
+            HSVMode = 2;
         }
 
         // get min or max

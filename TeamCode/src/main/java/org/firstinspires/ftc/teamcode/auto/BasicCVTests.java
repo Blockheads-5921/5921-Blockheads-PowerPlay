@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@TeleOp(name = "ooga booga cv", group = "Robot")
+@Autonomous(name = "ooga booga cv", group = "Robot")
 public class BasicCVTests extends LinearOpMode {
     OpenCvCamera camera;
     BasicPipeline basicPipeline = new BasicPipeline();
@@ -72,7 +72,7 @@ public class BasicCVTests extends LinearOpMode {
             } else if (gamepad1.x) {
                 HSVMode = 1;
             } else if (gamepad1.a) {
-                HSVmode = 2;
+                HSVMode = 2;
             }
 
             // get min or max
