@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "F2/A5 Safer auto", group = "Robot")
+@Autonomous(name = "CV tests", group = "Robot")
 public class eocvTests extends LinearOpMode {
     OpenCvCamera camera;
     JunctionPipeline junctionPipeline = new JunctionPipeline();

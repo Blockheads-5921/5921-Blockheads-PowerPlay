@@ -74,7 +74,7 @@ import java.util.concurrent.TimeUnit;
  * using Media Transfer; ADB; etc)
  */
 @TeleOp(name="Preview: Webcam01", group ="Preview")
-@Disabled
+// @Disabled
 public class PreviewWebcam01 extends LinearOpMode {
 
     //----------------------------------------------------------------------------------------------
