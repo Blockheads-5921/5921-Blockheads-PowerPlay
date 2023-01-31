@@ -83,7 +83,7 @@ public class BaseDriveCompleteGyro extends LinearOpMode {
     }
 
     private void UpdatePlayers() {
-        double drivePower = 0.25;
+        double drivePower = 0.40;
         if (gamepad1.right_bumper) drivePower = 1;
         DriveTrainBase(drivePower);
         DriveMicroAdjust(0.4);

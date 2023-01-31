@@ -3,6 +3,7 @@ import com.acmerobotics.roadrunner.drive.Drive;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Utility;
 
 @TeleOp(name = "HSV Adjustments", group = "Drive")
-//@Disabled
+@Disabled
 public class HSVAdjuster extends LinearOpMode {
     /* Declare OpMode members. */
     HardwareDrive robot = new HardwareDrive();
@@ -56,7 +57,7 @@ public class HSVAdjuster extends LinearOpMode {
         } else if (gamepad1.x) {
             HSVMode = 1;
         } else if (gamepad1.a) {
-            HSVmode = 2;
+            HSVMode = 2;
         }
 
         // get min or max

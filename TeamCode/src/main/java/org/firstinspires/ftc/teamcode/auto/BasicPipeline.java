@@ -18,18 +18,18 @@ import java.util.List;
 
 class BasicPipeline extends OpenCvPipeline {
 
-    Scalar darkestJunctions = new Scalar(0,0,0);
-    Scalar lightestJunctions = new Scalar(360, 100, 100);
+    Scalar darkestJunctions = new Scalar(0, 150, 0);
+    Scalar lightestJunctions = new Scalar(100, 200, 100);
 
     public Mat processFrame(Mat input) {
 
         // apparently openCV likes BGR more than RGB, so convert our image from RGB to BGR
-        Mat rawBGR = new Mat();
-        Imgproc.cvtColor(input, rawBGR, Imgproc.COLOR_RGB2BGR);
+        Mat rawHSV = new Mat();
+        Imgproc.cvtColor(input, rawHSV, Imgproc.COLOR_RGB2HSV);
 
         // Threshold image, turning it into binary (only black and white). Now openCV knows what to get the contour, or shape, of.
         Mat thresholded = new Mat();
-        Core.inRange(rawBGR, lightestJunctions, darkestJunctions, thresholded);
+        Core.inRange(rawHSV, darkestJunctions, lightestJunctions, thresholded);
         return thresholded;
     }
 

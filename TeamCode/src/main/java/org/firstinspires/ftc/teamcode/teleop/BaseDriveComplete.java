@@ -25,11 +25,6 @@ public class BaseDriveComplete extends LinearOpMode {
     private final Button lifterButton = new Button();
     private final Button lifterBottomButton = new Button();
     private final boolean toggleButton = true;
-    // get goofy sounds
-    int vineBoomSoundID = hardwareMap.appContext.getResources().getIdentifier("vineboom", "raw", hardwareMap.appContext.getPackageName());
-    int runningSoundID = hardwareMap.appContext.getResources().getIdentifier("running", "raw", hardwareMap.appContext.getPackageName());
-    int slidingSoundID = hardwareMap.appContext.getResources().getIdentifier("slide", "raw", hardwareMap.appContext.getPackageName());
-    boolean soundPlayed = true;
 
     @Override
     public void runOpMode() {
@@ -38,7 +33,6 @@ public class BaseDriveComplete extends LinearOpMode {
         robot.init(hardwareMap);
         robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, runningSoundID);
 
         waitForStart();
 
@@ -61,20 +55,11 @@ public class BaseDriveComplete extends LinearOpMode {
         else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {robot.lift.setPower((gamepad2.left_stick_y) * 0.01);}
         else {robot.lift.setPower((gamepad2.left_stick_y - 0.001) * 0.90);} // all this works because both the lift and left_stick_y are inverted
 
-        if (gamepad2.right_stick_y < 0 && !soundPlayed) {
-            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, slidingSoundID);
-            soundPlayed = true;
-        }
-
         if (gamepad2.left_trigger > 0.01) {
             serv0.setPower(0.18 * gamepad2.left_trigger - 0);
-            if (!soundPlayed) {
-                SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, vineBoomSoundID);
-                soundPlayed = true;
-            }
         } else if (gamepad2.right_trigger > 0.01) {serv0.setPower(-0.1 * gamepad2.right_trigger + 0);}
 
-        if (gamepad2.right_stick_y > 0 & gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0) {soundPlayed = false;} //consider different soundPlayeds for different sounds?
+        if (gamepad2.right_stick_y > 0 & gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0)
 
         DriveMicroAdjust(0.2);
         UpdateTelemetry();

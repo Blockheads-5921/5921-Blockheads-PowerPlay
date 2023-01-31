@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@TeleOp(name = "ooga booga cv", group = "Robot")
+@Autonomous(name = "ooga booga cv", group = "Robot")
 public class BasicCVTests extends LinearOpMode {
     OpenCvCamera camera;
     BasicPipeline basicPipeline = new BasicPipeline();
@@ -53,6 +53,11 @@ public class BasicCVTests extends LinearOpMode {
             }
         });
 
+        while(!isStarted() && !isStopRequested()) {
+            telemetry.addLine("pootis");
+        }
+
+        /*
         telemetry.setMsTransmissionInterval(50);
 
         int[] HSVlow = new int[] {0,0,0};
@@ -83,6 +88,7 @@ public class BasicCVTests extends LinearOpMode {
 
             // actually adjust
             if (gamepad1.left_stick_y < 0.5) {
+                telemetry.addLine("Joystick pushed up");
                 if (minOrMax == 0) { // not gonna figure out 2d arrays now
                     HSVlow[HSVMode] += 5;
                     basicPipeline.setScalarValues(0, HSVlow[0], HSVlow[1], HSVlow[2]);
@@ -104,5 +110,7 @@ public class BasicCVTests extends LinearOpMode {
             telemetry.addData("High scalar: ", HSVhigh);
             telemetry.update();
         }
+
+         */
     }
 }
