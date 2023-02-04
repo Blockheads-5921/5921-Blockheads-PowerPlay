@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "ooga booga cv", group = "Robot")
+@Autonomous(name = "Basic CV Tests", group = "Robot")
 public class BasicCVTests extends LinearOpMode {
     OpenCvCamera camera;
     BasicPipeline basicPipeline = new BasicPipeline();
@@ -54,7 +54,9 @@ public class BasicCVTests extends LinearOpMode {
         });
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addLine("pootis");
+            telemetry.addData("Number of contours found: ", basicPipeline.getContourQuantity());
+            telemetry.addData("x and y of biggest contour: ", basicPipeline.getJunctionXY());
+            telemetry.update();
         }
 
         /*

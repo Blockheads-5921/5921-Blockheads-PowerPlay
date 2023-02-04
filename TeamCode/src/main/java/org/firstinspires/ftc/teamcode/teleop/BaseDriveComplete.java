@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.FtcDashboard;
 import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.common.Button;
 import org.firstinspires.ftc.teamcode.common.Constants;
@@ -22,12 +25,13 @@ public class BaseDriveComplete extends LinearOpMode {
     private final Constants constants = new Constants();
     private CRServo serv0;
     private final ElapsedTime runtime = new ElapsedTime();
-    private final Button lifterButton = new Button();
-    private final Button lifterBottomButton = new Button();
-    private final boolean toggleButton = true;
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
 
     @Override
+
+
     public void runOpMode() {
+        Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
         runtime.reset();
         serv0 = hardwareMap.get(CRServo.class, "serv0");
         robot.init(hardwareMap);
