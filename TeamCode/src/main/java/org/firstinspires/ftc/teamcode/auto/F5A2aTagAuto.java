@@ -188,6 +188,9 @@ public class F5A2aTagAuto extends LinearOpMode
 
         }
         // we are now in centered on the tile in front of the high junction, facing away from our substation.
+        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
         DriveForward(100, autoPower);
 
         if(tagOfInterest == null){
@@ -201,6 +204,9 @@ public class F5A2aTagAuto extends LinearOpMode
             // Signal zone 3
             StrafeRight(1800, 70);
         }
+        telemetry.addLine("GO GET EM!!!");
+        telemetry.update();
+        sleep(3000);
 
 
     }
