@@ -19,7 +19,7 @@ import java.util.Optional;
 
 class BasicPipeline extends OpenCvPipeline {
 
-    Scalar darkestJunctions = new Scalar(15, 150, 100);
+    Scalar darkestJunctions = new Scalar(15, 128, 128);
     Scalar lightestJunctions = new Scalar(60, 255, 255);
     Mat rawHSV = new Mat();
     Mat blurredHSV = new Mat();
@@ -32,7 +32,7 @@ class BasicPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, rawHSV, Imgproc.COLOR_RGB2HSV);
 
         // Blur image to lessen noise
-        Imgproc.GaussianBlur(rawHSV, blurredHSV, new Size(15, 15), 0);
+        Imgproc.GaussianBlur(rawHSV, blurredHSV, new Size(15, 15), 0); // increase?
 
         // Threshold image, turning it into binary (only black and white). Now openCV knows what to get the contour, or shape, of.
         Core.inRange(blurredHSV, darkestJunctions, lightestJunctions, thresholded);
@@ -42,14 +42,19 @@ class BasicPipeline extends OpenCvPipeline {
         Imgproc.findContours(thresholded, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         contoursAttr = contours;
 
-        Optional<MatOfPoint> biggestContour = contours.stream().max(Comparator.comparing(Imgproc::contourArea));
+        // doesn't work now, conflicting types
+        for (MatOfPoint curContour : contours) {
+            if (Imgproc.contourArea(curContour) > Imgproc.contourArea(biggestContour)) {
+                biggestContour = curContour;
+            }
+        }
 
         // Find centroid of biggest contour
         Moments moments = Imgproc.moments(biggestContour.get());
         Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(),
                 moments.get_m01() / moments.get_m00());
 
-        junctionPointAttr = junctionPoint; // probably we can just set it directly or smth
+        junctionPointAttr = junctionPoint; // probably we can just set junctionPointAttr directly or smth
 
         Imgproc.drawContours(input, contours, -1, new Scalar(0,255,0), 3);
 
