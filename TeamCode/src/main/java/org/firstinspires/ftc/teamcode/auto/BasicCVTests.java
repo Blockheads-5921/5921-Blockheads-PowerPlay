@@ -15,7 +15,11 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
+import org.opencv.core.*;
+
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Autonomous(name = "Basic CV Tests", group = "Robot")
 public class BasicCVTests extends LinearOpMode {
@@ -53,9 +57,19 @@ public class BasicCVTests extends LinearOpMode {
             }
         });
 
+        List<Point> centroidList = new ArrayList<>();
+
         while(!isStarted() && !isStopRequested()) {
             telemetry.addData("Number of contours found: ", basicPipeline.getContourQuantity());
-            telemetry.addData("x and y of biggest contour: ", basicPipeline.getJunctionXY());
+
+            centroidList = basicPipeline.getJunctionPoints();
+
+            telemetry.addData("Size of centroid list: ", centroidList.size());
+            if (centroidList.size() > 0) {
+                telemetry.addData("The first centroid in the list of centroids!!! ", centroidList.get(0).x);
+            } else {
+                telemetry.addLine("The centroid list is empty but at least it's acting normal");
+            }
             telemetry.update();
         }
 

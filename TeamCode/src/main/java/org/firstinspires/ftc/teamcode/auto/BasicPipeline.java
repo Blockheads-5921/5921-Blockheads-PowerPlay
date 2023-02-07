@@ -25,7 +25,7 @@ class BasicPipeline extends OpenCvPipeline {
     Mat blurredHSV = new Mat();
     Mat thresholded = new Mat();
     List<MatOfPoint> contoursAttr = new ArrayList<>();
-    Point junctionPointAttr = new Point();
+    List<Point> junctionPointsAttr = new ArrayList<>();
 
     public Mat processFrame(Mat input) {
         // Convert image to HSV
@@ -43,18 +43,30 @@ class BasicPipeline extends OpenCvPipeline {
         contoursAttr = contours;
 
         // doesn't work now, conflicting types
-        for (MatOfPoint curContour : contours) {
-            if (Imgproc.contourArea(curContour) > Imgproc.contourArea(biggestContour)) {
-                biggestContour = curContour;
-            }
-        }
+
+        MatOfPoint biggestContour = new MatOfPoint();
+
+        // for (MatOfPoint curContour : contours) {
+        //     if (Imgproc.contourArea(curContour) > Imgproc.contourArea(biggestContour)) {
+        //         biggestContour = curContour;
+        //     }
+        // }
 
         // Find centroid of biggest contour
-        Moments moments = Imgproc.moments(biggestContour.get());
-        Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(),
-                moments.get_m01() / moments.get_m00());
+        // Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(),
+        //         moments.get_m01() / moments.get_m00());
 
-        junctionPointAttr = junctionPoint; // probably we can just set junctionPointAttr directly or smth
+
+        List<Point> junctionPoints = new ArrayList<>();
+
+        for (MatOfPoint curContour : contours) {
+            Moments moments = Imgproc.moments(curContour);
+            junctionPoints.add(new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00()));
+        }
+
+        junctionPointsAttr = junctionPoints;
+
+        // junctionPointAttr = junctionPoint; // probably we can just set junctionPointAttr directly or smth
 
         Imgproc.drawContours(input, contours, -1, new Scalar(0,255,0), 3);
 
@@ -64,8 +76,7 @@ class BasicPipeline extends OpenCvPipeline {
     public int getContourQuantity() {
         return contoursAttr.size();
     }
-
-    public double[] getJunctionXY() {
-        return new double[] {junctionPointAttr.x, junctionPointAttr.y};
+    public List<Point> getJunctionPoints() {
+        return junctionPointsAttr;
     }
 }
