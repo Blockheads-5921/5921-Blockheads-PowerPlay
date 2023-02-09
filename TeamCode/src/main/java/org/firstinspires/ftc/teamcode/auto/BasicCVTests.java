@@ -57,19 +57,16 @@ public class BasicCVTests extends LinearOpMode {
             }
         });
 
-        List<Point> centroidList = new ArrayList<>();
+        Point junctionLocation = new Point();
 
         while(!isStarted() && !isStopRequested()) {
             telemetry.addData("Number of contours found: ", basicPipeline.getContourQuantity());
 
-            centroidList = basicPipeline.getJunctionPoints();
+            junctionLocation = basicPipeline.getJunctionPoint();
 
-            telemetry.addData("Size of centroid list: ", centroidList.size());
-            if (centroidList.size() > 0) {
-                telemetry.addData("The first centroid in the list of centroids!!! ", centroidList.get(0).x);
-            } else {
-                telemetry.addLine("The centroid list is empty but at least it's acting normal");
-            }
+            telemetry.addData("x of biggest contour: ", junctionLocation.x);
+            telemetry.addData("y of biggest contour: ", junctionLocation.y);
+
             telemetry.update();
         }
 

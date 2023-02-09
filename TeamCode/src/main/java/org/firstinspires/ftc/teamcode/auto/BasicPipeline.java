@@ -25,7 +25,7 @@ class BasicPipeline extends OpenCvPipeline {
     Mat blurredHSV = new Mat();
     Mat thresholded = new Mat();
     List<MatOfPoint> contoursAttr = new ArrayList<>();
-    List<Point> junctionPointsAttr = new ArrayList<>();
+    Point junctionPointAttr = new Point();
 
     public Mat processFrame(Mat input) {
         // Convert image to HSV
@@ -42,31 +42,31 @@ class BasicPipeline extends OpenCvPipeline {
         Imgproc.findContours(thresholded, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         contoursAttr = contours;
 
-        // doesn't work now, conflicting types
+        if (!contours.isEmpty())
+        {
+            MatOfPoint biggestContour = contours.get(0);//new MatOfPoint();
 
-        MatOfPoint biggestContour = new MatOfPoint();
+            for (MatOfPoint curContour : contours) {
+                if (Imgproc.contourArea(curContour) > Imgproc.contourArea(biggestContour)) {
+                    biggestContour = curContour;
+                }
+            }
 
-        // for (MatOfPoint curContour : contours) {
-        //     if (Imgproc.contourArea(curContour) > Imgproc.contourArea(biggestContour)) {
-        //         biggestContour = curContour;
-        //     }
-        // }
+            Moments moments = Imgproc.moments(biggestContour);
+            Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00());
 
-        // Find centroid of biggest contour
-        // Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(),
-        //         moments.get_m01() / moments.get_m00());
-
-
-        List<Point> junctionPoints = new ArrayList<>();
-
-        for (MatOfPoint curContour : contours) {
-            Moments moments = Imgproc.moments(curContour);
-            junctionPoints.add(new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00()));
+            junctionPointAttr = junctionPoint;
         }
 
-        junctionPointsAttr = junctionPoints;
 
-        // junctionPointAttr = junctionPoint; // probably we can just set junctionPointAttr directly or smth
+        // List<Point> junctionPoints = new ArrayList<>();
+
+        // for (MatOfPoint curContour : contours) {
+        //     Moments moments = Imgproc.moments(curContour);
+        //     junctionPoints.add(new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00()));
+        // }
+
+        // junctionPointsAttr = junctionPoints;
 
         Imgproc.drawContours(input, contours, -1, new Scalar(0,255,0), 3);
 
@@ -76,7 +76,7 @@ class BasicPipeline extends OpenCvPipeline {
     public int getContourQuantity() {
         return contoursAttr.size();
     }
-    public List<Point> getJunctionPoints() {
-        return junctionPointsAttr;
+    public Point getJunctionPoint() {
+        return junctionPointAttr;
     }
 }
