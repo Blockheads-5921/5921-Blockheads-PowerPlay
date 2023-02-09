@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -25,8 +27,6 @@ import java.util.List;
 public class BasicCVTests extends LinearOpMode {
     OpenCvCamera camera;
     BasicPipeline basicPipeline = new BasicPipeline();
-
-    // AprilTagDetection tagOfInterest = null;
 
     Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
@@ -66,64 +66,50 @@ public class BasicCVTests extends LinearOpMode {
 
             telemetry.addData("x of biggest contour: ", junctionLocation.x);
             telemetry.addData("y of biggest contour: ", junctionLocation.y);
+            telemetry.addData("Size of biggest contour: ", basicPipeline.getBigJunctionSizeAttr());
 
             telemetry.update();
         }
 
-        /*
-        telemetry.setMsTransmissionInterval(50);
+        telemetry.addLine("Position robot now!");
+        telemetry.update();
+        sleep(4000);
 
-        int[] HSVlow = new int[] {0,0,0};
-        int[] HSVhigh = new int[] {360,0,0};
+        junctionLocation = basicPipeline.getJunctionPoint();
+        telemetry.addData("Adjusting position; Last junction x was", junctionLocation.x);
+        telemetry.update();
+        StrafeRight((int) junctionLocation.x-300, 25);
+    }
 
-        int HSVMode = 0;
+    private void StrafeRight(int straferightEncoderPulses, double drivePower) {
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        int minOrMax = 0;
+        robot.lf.setTargetPosition(-straferightEncoderPulses);
+        robot.rf.setTargetPosition(-straferightEncoderPulses);
+        robot.lb.setTargetPosition(straferightEncoderPulses);
+        robot.rb.setTargetPosition(straferightEncoderPulses);
 
-        while (!isStopRequested()) {
-            telemetry.addLine("press Y to adjust hue, X to adjust saturation, A to adjust value.");
-            telemetry.addLine("Use left joystick to actually adjust, and press B to switch between min and max values");
+        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lf.setPower(drivePower);
+        robot.rf.setPower(drivePower);
+        robot.lb.setPower(drivePower);
+        robot.rb.setPower(drivePower);
 
-            // get hsv mode
-            if (gamepad1.y) {
-                HSVMode = 0;
-            } else if (gamepad1.x) {
-                HSVMode = 1;
-            } else if (gamepad1.a) {
-                HSVmode = 2;
-            }
-
-            // get min or max
-            if (gamepad1.b) {
-                if (minOrMax == 0) {minOrMax = 1;}
-                else {minOrMax = 0;}
-            }
-
-            // actually adjust
-            if (gamepad1.left_stick_y < 0.5) {
-                telemetry.addLine("Joystick pushed up");
-                if (minOrMax == 0) { // not gonna figure out 2d arrays now
-                    HSVlow[HSVMode] += 5;
-                    basicPipeline.setScalarValues(0, HSVlow[0], HSVlow[1], HSVlow[2]);
-                } else if (minOrMax == 1) {
-                    HSVhigh[HSVMode] += 5;
-                    basicPipeline.setScalarValues(1, HSVhigh[0], HSVhigh[1], HSVhigh[2]);
-                }
-            } else if (gamepad1.left_stick_y > 0.5) {
-                if (minOrMax == 0) { // i realise how horrible this is
-                    HSVlow[HSVMode] -= 5;
-                    basicPipeline.setScalarValues(0, HSVlow[0], HSVlow[1], HSVlow[2]);
-                } else if (minOrMax == 1) {
-                    HSVhigh[HSVMode] -= 5;
-                    basicPipeline.setScalarValues(1, HSVhigh[0], HSVhigh[1], HSVhigh[2]);
-                }
-            } // i solemnly swear upon vim never to do this again
-
-            telemetry.addData("Low scalar: ", HSVlow);
-            telemetry.addData("High scalar: ", HSVhigh);
+        // update the telemetry monitor
+        while (opModeIsActive() && (robot.lf.isBusy())) {
+            telemetry.addData("Running to", " %7d ", straferightEncoderPulses);
+            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
             telemetry.update();
         }
-
-         */
     }
 }

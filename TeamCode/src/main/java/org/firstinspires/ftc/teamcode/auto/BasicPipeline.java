@@ -17,7 +17,7 @@ import java.util.Optional;
 
 // have JunctionPipeline return an x coordinate and a y coordinate in a list, maybe?
 
-class BasicPipeline extends OpenCvPipeline {
+public class BasicPipeline extends OpenCvPipeline {
 
     Scalar darkestJunctions = new Scalar(15, 128, 128);
     Scalar lightestJunctions = new Scalar(60, 255, 255);
@@ -26,6 +26,7 @@ class BasicPipeline extends OpenCvPipeline {
     Mat thresholded = new Mat();
     List<MatOfPoint> contoursAttr = new ArrayList<>();
     Point junctionPointAttr = new Point();
+    double bigJunctionSizeAttr = 0;
 
     public Mat processFrame(Mat input) {
         // Convert image to HSV
@@ -55,6 +56,8 @@ class BasicPipeline extends OpenCvPipeline {
             Moments moments = Imgproc.moments(biggestContour);
             Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00());
 
+
+            bigJunctionSizeAttr = Imgproc.contourArea(biggestContour);
             junctionPointAttr = junctionPoint;
         }
 
@@ -66,13 +69,16 @@ class BasicPipeline extends OpenCvPipeline {
         //     junctionPoints.add(new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00()));
         // }
 
-        // junctionPointsAttr = junctionPoints;
+        // junctionPointsAttr = junctionPoints; monkey haha lol
 
         Imgproc.drawContours(input, contours, -1, new Scalar(0,255,0), 3);
 
         return input;
     }
 
+    public double getBigJunctionSizeAttr() {
+        return bigJunctionSizeAttr;
+    }
     public int getContourQuantity() {
         return contoursAttr.size();
     }
