@@ -33,11 +33,12 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
+import org.firstinspires.ftc.teamcode.auto.BasicPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-
+import org.opencv.core.*;
 import java.util.ArrayList;
 
 @Autonomous(name = "F2/A5 Apriltag auto", group = "Robot")
@@ -98,12 +99,7 @@ public class F2A5aTagAuto extends LinearOpMode
 
         telemetry.setMsTransmissionInterval(50);
 
-        /*
-         * The INIT-loop:
-         * This REPLACES waitForStart!
-         */
-
-
+        // Find AprilTags in init-loop
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
             if(currentDetections.size() != 0)    {
@@ -127,23 +123,19 @@ public class F2A5aTagAuto extends LinearOpMode
             sleep(20);
         }
 
-        /*
-         * The START command just came in: now work off the latest snapshot acquired
-         * during the init loop.
-         */
+        // Drivers pressed play, switch pipeline to detect junctions
+        BasicPipeline basicPipeline = new BasicPipeline();
+        camera.setPipeline(basicPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
+            }
 
-        /* Update the telemetry */
-        if(tagOfInterest != null)
-        {
-            telemetry.addLine("Tag snapshot:\n");
-            tagToTelemetry(tagOfInterest);
-            telemetry.update();
-        }
-        else
-        {
-            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-            telemetry.update();
-        }
+            @Override
+            public void onError(int errorCode) {
+            }
+        });
 
         // SCRIPT FOR F2
 
@@ -151,40 +143,68 @@ public class F2A5aTagAuto extends LinearOpMode
         double autoPower = 0.40;
         serv0.setPower(-0.1);
         sleep(200);
+        // Drive around signal cone to target junction
         StrafeRight(1200, autoPower);
-        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
         DriveForward(2200, autoPower);
         StrafeLeft(540, autoPower);
-        sleep(500);
+        // Drop pre-loaded cone
+        // Stabilise
+        sleep(2000);
+        // Give us data
+        for (int i = 0; i < 2000; i++) {
+            telemetry.addData("Distance to junction: ", basicPipeline.getJunctionDistance());
+            telemetry.addData("X of junction: ", basicPipeline.getJunctionPoint().x);
+            telemetry.addData("Iteration: ", i);
+            telemetry.update();
+            sleep(1);
+        }
+        // Let us read it
+        sleep(1500);
+        // Adjust and drop
+        TeleopStyleDrive((basicPipeline.getJunctionPoint().x-400)/400, (basicPipeline.getJunctionDistance()-3)/6, 0, 0.25, 200);
+        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
+        sleep(1000);
         serv0.setPower(0.17);
 
-        for (int i = 0; i<2; i++) {
-            //Face cone stack
+        for (int i = 0; i<1; i++) {
+            // Face cone stack
             SpinLeft(910, autoPower);
-            //Lower lift
+            // Lower lift
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
-            //drive to cone stack
-            DriveForward(1900, autoPower);
-            //grab cone
+            // drive to cone stack
+            DriveForward(1850, autoPower);
+            // grab cone
             serv0.setPower(-0.1);
             sleep(300);
-            //raise lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+            // raise lift partways so we can still see junction
+            robot.lift.setTargetPosition(Constants.elevatorPositionLow);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // go to high pole
             DriveReverse(1750, autoPower);
             SpinRight(920, autoPower);
-            //drop cone
-            sleep(300);
+            // AIMBOT!!!
+            sleep(2000);
+            telemetry.addData("Distance to junction: ", basicPipeline.getJunctionDistance());
+            telemetry.update();
+            sleep(1500);
+            TeleopStyleDrive((basicPipeline.getJunctionPoint().x-400)/400, (basicPipeline.getJunctionDistance()-3)/6, 0, 0.25, 200);
+            // drop cone
+            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.lift.setPower(0.8);
+            sleep(500);
             serv0.setPower(0.17);
 
         }
-        // we are now in centered on the tile in front of the high junction, facing away from our substation.
+        // we are now in centered in front of the high junction, facing away from our substation.
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
@@ -208,18 +228,34 @@ public class F2A5aTagAuto extends LinearOpMode
 
     }
 
+    private void TeleopStyleDrive(double x, double y, double r, double drivePower, int distance) {
+        // x, y, r, and drivePower should be between -1 and 1, and distance can be whatever
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        y *= -1;
+        r *= -1;
+        robot.lf.setTargetPosition((int)((y + r - x)*distance));
+        robot.rf.setTargetPosition((int)((-y + r - x)*distance));
+        robot.lb.setTargetPosition((int)((y + r + x)*distance));
+        robot.rb.setTargetPosition((int)((-y + r + x)*distance));
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
-        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.lf.setPower((y + r - x) * drivePower);
+        robot.rf.setPower((-y + r - x) * drivePower);
+        robot.lb.setPower((y + r + x) * drivePower);
+        robot.rb.setPower((-y + r + x) * drivePower);
+
+        while (opModeIsActive() && (robot.lf.isBusy())) {
+            telemetry.addLine("Aiming robot...");
+            telemetry.update();
+        }
     }
-
 
     private void SetBrakes(boolean brakesOn) {
         if (brakesOn) {
@@ -234,6 +270,17 @@ public class F2A5aTagAuto extends LinearOpMode
             robot.rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
     }
+
+    void tagToTelemetry(AprilTagDetection detection) {
+        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
+    }
+
 
     private void StrafeRight(int straferightEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -443,44 +490,6 @@ public class F2A5aTagAuto extends LinearOpMode
             RobotLog.d("Reverse: Encoders: %7d,%7d,%7d,%7d", robot.lf.getCurrentPosition(),
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
-    }
-
-    private void DepositCone(int junctionLevel, int downLiftHeight){
-        //assumes lift is at bottom
-        int targetPos = 0;
-        switch (junctionLevel) {
-            case 1:
-                targetPos = Constants.elevatorPositionLow;
-                break;
-            case 2:
-                targetPos = Constants.elevatorPositionMid;
-                break;
-            case 3:
-                targetPos = Constants.elevatorPositionTop;
-                break;
-        }
-        //raise arm
-        robot.lift.setTargetPosition(targetPos);
-        robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(1.00);
-        sleep(2300);
-        robot.lift.setPower(0); //Brake arm, maybe unnecessary?
-        //Drive forward
-        SetBrakes(false);
-        DriveForward(75,0.15);
-        //Release cone
-        serv0.setPower(0.18);
-        //Back up
-        DriveReverse(75,0.30);
-        sleep(250);
-        //lower arm
-        robot.lift.setTargetPosition(downLiftHeight); // The lift's mechanism might not be enough to hold it at downLiftHeight,
-                                                      // in which case we have to do a bunch of annoying stuff
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.75);
-        sleep(750);
-        SetBrakes(true);
     }
 }
 

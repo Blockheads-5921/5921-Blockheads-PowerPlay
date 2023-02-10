@@ -83,7 +83,7 @@ public class BaseDriveComplete extends LinearOpMode {
         else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {
             robot.lift.setPower((gamepad2.left_stick_y) * 0.01);
         } else {
-            robot.lift.setPower((gamepad2.left_stick_y - 0.001) * 0.90);
+            robot.lift.setPower((gamepad2.left_stick_y - 0.001) * 1.00);
         } // all this works because both the lift and left_stick_y are inverted
 
         if (gamepad2.left_trigger > 0.01) {
