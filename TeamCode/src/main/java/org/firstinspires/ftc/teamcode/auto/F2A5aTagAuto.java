@@ -135,8 +135,9 @@ public class F2A5aTagAuto extends LinearOpMode
 
         Point junctionLocation = new Point();
         double junctionDistance = 0;
+
         SetBrakes(true);
-        double autoPower = 0.40;
+        double autoPower = 0.60;
 
         serv0.setPower(-0.1);
         sleep(200);
@@ -147,10 +148,8 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setPower(0.8);
         DriveForward(2200, autoPower);
         StrafeLeft(540, autoPower);
-        // Stabilize
-        sleep(1000);
-        // Search
-        for (int searchIteration = 0; searchIteration<50000; searchIteration++) {
+        // Search for junction TODO: put this stuff in a method.
+        for (int searchIteration = 0; searchIteration<25000; searchIteration++) {
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
             telemetry.addData("Iteration: ", searchIteration);
@@ -158,20 +157,20 @@ public class F2A5aTagAuto extends LinearOpMode
             telemetry.addData("Junction distance: ", junctionDistance);
             telemetry.update();
         }
-        // Drop!
+        // Adjust and drop!
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
-        sleep(4000);
+        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-3) / 6, 0, 0.4, 200);
+        sleep(2000); // TODO: decrease this. about to leave the shop, don't have time 2 test
         serv0.setPower(0.17);
 
-        for (int cycle = 0; cycle<1; cycle++) {
-            DriveReverse(50, autoPower);
+        for (int cycle = 0; cycle<2; cycle++) {
+            DriveReverse(25, autoPower);
             // Face cone stack
             SpinLeft(920, autoPower);
             // Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+cycle*150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-500+cycle*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
@@ -187,10 +186,8 @@ public class F2A5aTagAuto extends LinearOpMode
             DriveReverse(1750, autoPower);
             SpinRight(920, autoPower);
             // AIMBOT!!!
-            // Stabilize
-            sleep(1000);
             // Search
-            for (int searchIteration = 0; searchIteration<50000; searchIteration++) {
+            for (int searchIteration = 0; searchIteration<25000; searchIteration++) {
                 junctionLocation = basicPipeline.getJunctionPoint();
                 junctionDistance = basicPipeline.getJunctionDistance();
                 telemetry.addData("Iteration: ", searchIteration);
@@ -198,19 +195,19 @@ public class F2A5aTagAuto extends LinearOpMode
                 telemetry.addData("Junction distance: ", junctionDistance);
                 telemetry.update();
             }
-            // Drop!
+            // Adjust and drop!
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
-            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
-            sleep(4000);
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-3) / 6, 0, 0.4, 200);
+            sleep(2000);
             serv0.setPower(0.17);
         }
         // we are now in centered in front of the high junction, facing away from our substation.
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveForward(100, autoPower);
+        DriveReverse(25, autoPower);
 
         if(tagOfInterest == null){
             //default trajectory here if preferred
