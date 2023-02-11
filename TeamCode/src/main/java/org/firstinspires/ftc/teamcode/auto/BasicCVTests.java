@@ -59,29 +59,54 @@ public class BasicCVTests extends LinearOpMode {
         Point junctionLocation = new Point();
         double junctionDistance = 0;
 
+        int iteration = 0;
+
         // init-loop
         while(!isStarted() && !isStopRequested()) {
-
+            /*
+            iteration++;
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
 
+            telemetry.addData("Iteration: ", iteration);
+            telemetry.addData("Number of contours: ", basicPipeline.getJunctionNum());
             telemetry.addData("x of biggest contour: ", junctionLocation.x);
             telemetry.addData("y of biggest contour: ", junctionLocation.y);
             telemetry.addData("Distance to junction: ", junctionDistance);
 
             telemetry.update();
+
+             */
         }
 
         // PUT AIMBOT SCRIPT HERE
 
-        junctionLocation = basicPipeline.getJunctionPoint();
-        junctionDistance = basicPipeline.getJunctionDistance();
-        telemetry.addData("Adjusting position; Last junction x was", junctionLocation.x);
-        telemetry.addData("Junction distance: ", junctionDistance);
-        telemetry.update();
+        double autoPower = 0.25;
+
+        serv0.setPower(-0.1);
+        sleep(500);
+        StrafeRight(1200, autoPower);
+        robot.lift.setTargetPosition(Constants.elevatorPositionLow);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
+        DriveForward(2200, autoPower);
+        StrafeLeft(540, autoPower);
+
+        for (int i = 0; i<50000; i++) {
+            junctionLocation = basicPipeline.getJunctionPoint();
+            junctionDistance = basicPipeline.getJunctionDistance();
+            telemetry.addData("Iteration: ", i);
+            telemetry.addData("Adjusting position; Last junction x was", junctionLocation.x);
+            telemetry.addData("Junction distance: ", junctionDistance);
+            telemetry.update();
+        }
+        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
+        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lift.setPower(0.8);
         sleep(2000);
-        TeleopStyleDrive((junctionLocation.x-400)/400, (junctionDistance-3)/6, 0, 0.25, 200);
-        sleep(5000);
+        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
+        sleep(3000);
+        serv0.setPower(0.17);
     }
 
     private void TeleopStyleDrive(double x, double y, double r, double drivePower, int distance) {
@@ -109,6 +134,39 @@ public class BasicCVTests extends LinearOpMode {
 
         while (opModeIsActive() && (robot.lf.isBusy())) {
             telemetry.addLine("Aiming robot...");
+            telemetry.update();
+        }
+    }
+
+    private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        robot.lf.setTargetPosition(strafeleftEncoderPulses);
+        robot.rf.setTargetPosition(strafeleftEncoderPulses);
+        robot.lb.setTargetPosition(-strafeleftEncoderPulses);
+        robot.rb.setTargetPosition(-strafeleftEncoderPulses);
+
+        robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.lf.setPower(drivePower);
+        robot.rf.setPower(drivePower);
+        robot.lb.setPower(drivePower);
+        robot.rb.setPower(drivePower);
+
+        while (opModeIsActive() &&
+                // (runtime.seconds() < timeoutS) &&
+                (robot.lf.isBusy())) {
+            telemetry.addData("Running to", " %7d ", strafeleftEncoderPulses);
+            telemetry.addData("Currently at", " at %7d", robot.lf.getCurrentPosition());
             telemetry.update();
         }
     }

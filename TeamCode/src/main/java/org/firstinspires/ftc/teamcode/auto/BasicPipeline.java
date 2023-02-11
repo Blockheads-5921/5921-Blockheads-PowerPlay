@@ -24,6 +24,7 @@ public class BasicPipeline extends OpenCvPipeline {
     Mat rawHSV = new Mat();
     Mat blurredHSV = new Mat();
     Mat thresholded = new Mat();
+    int junctionNumAttr = 0;
     Point junctionPointAttr = new Point();
     double junctionDistanceAttr = 0;
 
@@ -55,7 +56,8 @@ public class BasicPipeline extends OpenCvPipeline {
             Moments moments = Imgproc.moments(biggestContour);
             Point junctionPoint = new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00());
 
-            //Assign to attributes
+            //Assign attributes
+            junctionNumAttr = contours.size();
             junctionDistanceAttr = 240000/Imgproc.contourArea(biggestContour);
             junctionPointAttr = junctionPoint;
         }
@@ -69,6 +71,7 @@ public class BasicPipeline extends OpenCvPipeline {
         return junctionPointAttr;
     }
 
+    public int getJunctionNum() {return junctionNumAttr;}
     public double getJunctionDistance() {
         return junctionDistanceAttr; // this is in inches
     }

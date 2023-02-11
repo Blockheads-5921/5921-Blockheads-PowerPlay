@@ -154,12 +154,11 @@ public class F2A5aTagAuto extends LinearOpMode
         // Stabilise
         sleep(2000);
         // Give us data
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 25000; i++) {
             telemetry.addData("Distance to junction: ", basicPipeline.getJunctionDistance());
             telemetry.addData("X of junction: ", basicPipeline.getJunctionPoint().x);
             telemetry.addData("Iteration: ", i);
             telemetry.update();
-            sleep(1);
         }
         // Let us read it
         sleep(1500);
