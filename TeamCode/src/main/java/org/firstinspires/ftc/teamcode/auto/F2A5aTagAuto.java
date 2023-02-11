@@ -103,7 +103,7 @@ public class F2A5aTagAuto extends LinearOpMode
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
             if(currentDetections.size() != 0)    {
-                boolean tagFound = false;
+                boolean tagFound = true;
                 for(AprilTagDetection tag : currentDetections) {
                     if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                         tagOfInterest = tag;
@@ -123,24 +123,21 @@ public class F2A5aTagAuto extends LinearOpMode
             sleep(20);
         }
 
+        while (!isStarted() && !isStopRequested()) {
+            telemetry.addLine("init loop");
+        }
+
         // Drivers pressed play, switch pipeline to detect junctions
         BasicPipeline basicPipeline = new BasicPipeline();
         camera.setPipeline(basicPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-            }
-        });
 
         // SCRIPT FOR F2
 
+        Point junctionLocation = new Point();
+        double junctionDistance = 0;
         SetBrakes(true);
         double autoPower = 0.40;
+
         serv0.setPower(-0.1);
         sleep(200);
         // Drive around signal cone to target junction
@@ -150,31 +147,31 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setPower(0.8);
         DriveForward(2200, autoPower);
         StrafeLeft(540, autoPower);
-        // Drop pre-loaded cone
-        // Stabilise
-        sleep(2000);
-        // Give us data
-        for (int i = 0; i < 25000; i++) {
-            telemetry.addData("Distance to junction: ", basicPipeline.getJunctionDistance());
-            telemetry.addData("X of junction: ", basicPipeline.getJunctionPoint().x);
-            telemetry.addData("Iteration: ", i);
+        // Stabilize
+        sleep(1000);
+        // Search
+        for (int searchIteration = 0; searchIteration<50000; searchIteration++) {
+            junctionLocation = basicPipeline.getJunctionPoint();
+            junctionDistance = basicPipeline.getJunctionDistance();
+            telemetry.addData("Iteration: ", searchIteration);
+            telemetry.addData("Adjusting position; Last junction x was", junctionLocation.x);
+            telemetry.addData("Junction distance: ", junctionDistance);
             telemetry.update();
         }
-        // Let us read it
-        sleep(1500);
-        // Adjust and drop
-        TeleopStyleDrive((basicPipeline.getJunctionPoint().x-400)/400, (basicPipeline.getJunctionDistance()-3)/6, 0, 0.25, 200);
+        // Drop!
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        sleep(1000);
+        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
+        sleep(4000);
         serv0.setPower(0.17);
 
-        for (int i = 0; i<1; i++) {
+        for (int cycle = 0; cycle<1; cycle++) {
+            DriveReverse(50, autoPower);
             // Face cone stack
-            SpinLeft(910, autoPower);
+            SpinLeft(920, autoPower);
             // Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+cycle*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
@@ -190,18 +187,24 @@ public class F2A5aTagAuto extends LinearOpMode
             DriveReverse(1750, autoPower);
             SpinRight(920, autoPower);
             // AIMBOT!!!
-            sleep(2000);
-            telemetry.addData("Distance to junction: ", basicPipeline.getJunctionDistance());
-            telemetry.update();
-            sleep(1500);
-            TeleopStyleDrive((basicPipeline.getJunctionPoint().x-400)/400, (basicPipeline.getJunctionDistance()-3)/6, 0, 0.25, 200);
-            // drop cone
+            // Stabilize
+            sleep(1000);
+            // Search
+            for (int searchIteration = 0; searchIteration<50000; searchIteration++) {
+                junctionLocation = basicPipeline.getJunctionPoint();
+                junctionDistance = basicPipeline.getJunctionDistance();
+                telemetry.addData("Iteration: ", searchIteration);
+                telemetry.addData("Adjusting position; Last junction x was", junctionLocation.x);
+                telemetry.addData("Junction distance: ", junctionDistance);
+                telemetry.update();
+            }
+            // Drop!
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
-            sleep(500);
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
+            sleep(4000);
             serv0.setPower(0.17);
-
         }
         // we are now in centered in front of the high junction, facing away from our substation.
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
