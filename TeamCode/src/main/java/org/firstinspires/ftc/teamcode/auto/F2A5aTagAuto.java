@@ -76,6 +76,7 @@ public class F2A5aTagAuto extends LinearOpMode
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -162,19 +163,19 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
         TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-3) / 6, 0, 0.4, 200);
-        sleep(2000); // TODO: decrease this. about to leave the shop, don't have time 2 test
+        sleep(1000);
         serv0.setPower(0.17);
 
         for (int cycle = 0; cycle<2; cycle++) {
             DriveReverse(25, autoPower);
             // Face cone stack
-            SpinLeft(920, autoPower);
+            SpinLeft(930, autoPower);
             // Lower lift
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom-500+cycle*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
-            DriveForward(1850, autoPower);
+            DriveForward(1750, autoPower);
             // grab cone
             serv0.setPower(-0.1);
             sleep(300);
