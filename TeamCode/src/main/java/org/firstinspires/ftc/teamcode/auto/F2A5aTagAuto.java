@@ -30,6 +30,19 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.teamcode.common.Utility;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
@@ -44,6 +57,11 @@ import java.util.ArrayList;
 @Autonomous(name = "F2/A5 Apriltag auto", group = "Robot")
 public class F2A5aTagAuto extends LinearOpMode
 {
+    // gyro stuff
+    BNO055IMU imu;
+    Orientation angles;
+    Acceleration gravity;
+
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -76,8 +94,19 @@ public class F2A5aTagAuto extends LinearOpMode
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
-        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
+        // adding gyro code
+        /*
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+        */
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "log920"), cameraMonitorViewId);
@@ -129,16 +158,20 @@ public class F2A5aTagAuto extends LinearOpMode
         }
 
         // Drivers pressed play, switch pipeline to detect junctions
+        // imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         BasicPipeline basicPipeline = new BasicPipeline();
         camera.setPipeline(basicPipeline);
 
         // SCRIPT FOR F2
 
+
         Point junctionLocation = new Point();
         double junctionDistance = 0;
 
         SetBrakes(true);
-        double autoPower = 0.60;
+        double autoPower = 0.50;
+
+        sleep(2000);
 
         serv0.setPower(-0.1);
         sleep(200);
@@ -150,7 +183,7 @@ public class F2A5aTagAuto extends LinearOpMode
         DriveForward(2200, autoPower);
         StrafeLeft(540, autoPower);
         // Search for junction TODO: put this stuff in a method.
-        for (int searchIteration = 0; searchIteration<25000; searchIteration++) {
+        for (int searchIteration = 0; searchIteration<10000; searchIteration++) {
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
             telemetry.addData("Iteration: ", searchIteration);
@@ -169,9 +202,9 @@ public class F2A5aTagAuto extends LinearOpMode
         for (int cycle = 0; cycle<2; cycle++) {
             DriveReverse(25, autoPower);
             // Face cone stack
-            SpinLeft(930, autoPower);
+            SpinLeft(930, 40);
             // Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-500+cycle*150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+cycle*150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
@@ -185,7 +218,7 @@ public class F2A5aTagAuto extends LinearOpMode
             robot.lift.setPower(0.8);
             // go to high pole
             DriveReverse(1750, autoPower);
-            SpinRight(920, autoPower);
+            SpinRight(930, 40);
             // AIMBOT!!!
             // Search
             for (int searchIteration = 0; searchIteration<25000; searchIteration++) {
@@ -200,7 +233,7 @@ public class F2A5aTagAuto extends LinearOpMode
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
-            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-3) / 6, 0, 0.4, 200);
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-2) / 6, 0, 0.4, 200);
             sleep(2000);
             serv0.setPower(0.17);
         }
@@ -491,5 +524,32 @@ public class F2A5aTagAuto extends LinearOpMode
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-}
 
+    public void HeadingCorrection(double desiredHeading, double drivePower) {
+        // firstAngle is the heading angle
+
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if (angles.firstAngle < 90) {
+            telemetry.addData("Angle: ", angles.firstAngle);
+            robot.lf.setPower(drivePower);
+            robot.rf.setPower(drivePower);
+            robot.lb.setPower(drivePower);
+            robot.rb.setPower(drivePower);
+        }
+
+        robot.lf.setPower(0);
+        robot.rf.setPower(0);
+        robot.lb.setPower(0);
+        robot.rb.setPower(0);
+    }
+}
