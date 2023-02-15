@@ -20,6 +20,7 @@
  */
 
 package org.firstinspires.ftc.teamcode.auto;
+
 import android.drm.DrmInfoEvent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,6 +31,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
+
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Constants;
 
@@ -43,8 +45,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import java.util.ArrayList;
 
 @Autonomous(name = "F2/A5 Safer auto", group = "Robot")
-public class F2A5Safe extends LinearOpMode
-{
+public class F2A5Safe extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -62,7 +63,7 @@ public class F2A5Safe extends LinearOpMode
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-     // Tag ID 1,2,3 from the 36h11 family
+    // Tag ID 1,2,3 from the 36h11 family
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
@@ -83,12 +84,10 @@ public class F2A5Safe extends LinearOpMode
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            public void onOpened() {
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -107,17 +106,17 @@ public class F2A5Safe extends LinearOpMode
 
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            if(currentDetections.size() != 0)    {
+            if (currentDetections.size() != 0) {
                 boolean tagFound = false;
-                for(AprilTagDetection tag : currentDetections) {
-                    if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
+                for (AprilTagDetection tag : currentDetections) {
+                    if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                         tagOfInterest = tag;
                         tagFound = true;
                         break;
                     }
                 }
 
-                if(tagFound) {
+                if (tagFound) {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
                 } else {
@@ -134,14 +133,11 @@ public class F2A5Safe extends LinearOpMode
          */
 
         /* Update the telemetry */
-        if(tagOfInterest != null)
-        {
+        if (tagOfInterest != null) {
             telemetry.addLine("Tag snapshot:\n");
             tagToTelemetry(tagOfInterest);
             telemetry.update();
-        }
-        else
-        {
+        } else {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
@@ -160,7 +156,7 @@ public class F2A5Safe extends LinearOpMode
         DriveForward(950, autoPower); //move robot to pad F3, we're basing all operations on row 3
         sleep(sleepTime);
         SetBrakes(true);
-        for (int i = 0; i < 1; i++){ //go back and forth between substation and high junction
+        for (int i = 0; i < 1; i++) { //go back and forth between substation and high junction
             StrafeLeft(1715, autoPower); //move to high pole
             SetBrakes(true);
             DepositCone(3); //drop cone on high pole (height 3)
@@ -168,29 +164,28 @@ public class F2A5Safe extends LinearOpMode
         StrafeLeft(400, autoPower);
         // Go to signal zone
 
-        if(tagOfInterest == null){
+        if (tagOfInterest == null) {
             //default trajectory here if preferred
-        }else if(tagOfInterest.id == LEFT){
+        } else if (tagOfInterest.id == LEFT) {
             // Signal zone 1
             DriveReverse(2095, autoPower);
             SetBrakes(true);
-        }else if(tagOfInterest.id == MIDDLE){
+        } else if (tagOfInterest.id == MIDDLE) {
             // Signal zone 2
             DriveReverse(1000, autoPower);
             SetBrakes(true);
-        }else{
+        } else {
             //right trajectory- we're already here
         }
 
-        }
+    }
 
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
+    void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
@@ -421,7 +416,7 @@ public class F2A5Safe extends LinearOpMode
         }
     }
 
-    private void DepositCone(int junctionLevel){
+    private void DepositCone(int junctionLevel) {
         //assumes lift is at bottom
         int targetPos = 0;
         switch (junctionLevel) {
@@ -444,15 +439,15 @@ public class F2A5Safe extends LinearOpMode
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(75,0.15);
+        DriveForward(75, 0.15);
         //Release cone
         serv0.setPower(0.18);
         //Back up
-        DriveReverse(75,0.30);
+        DriveReverse(75, 0.30);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom); // The lift's mechanism might not be enough to hold it at downLiftHeight,
-                                                      // in which case we have to do a bunch of annoying stuff
+        // in which case we have to do a bunch of annoying stuff
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.75);
         sleep(750);

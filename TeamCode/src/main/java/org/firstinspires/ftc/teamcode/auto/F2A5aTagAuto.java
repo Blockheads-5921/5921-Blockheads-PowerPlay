@@ -20,6 +20,7 @@
  */
 
 package org.firstinspires.ftc.teamcode.auto;
+
 import android.drm.DrmInfoEvent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -31,9 +32,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.common.Utility;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -52,15 +55,17 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.opencv.core.*;
+
 import java.util.ArrayList;
 
 @Autonomous(name = "F2/A5 Apriltag auto", group = "Robot")
-public class F2A5aTagAuto extends LinearOpMode
-{
+public class F2A5aTagAuto extends LinearOpMode {
     // gyro stuff
     BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
+    double autoPower = 0.50;
+    double encoderPulseDegrees = 10.22222222;
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -79,7 +84,7 @@ public class F2A5aTagAuto extends LinearOpMode
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-     // Tag ID 1,2,3 from the 36h11 family
+    // Tag ID 1,2,3 from the 36h11 family
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
@@ -113,12 +118,10 @@ public class F2A5aTagAuto extends LinearOpMode
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            public void onOpened() {
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -132,17 +135,17 @@ public class F2A5aTagAuto extends LinearOpMode
         // Find AprilTags in init-loop
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            if(currentDetections.size() != 0)    {
+            if (currentDetections.size() != 0) {
                 boolean tagFound = true;
-                for(AprilTagDetection tag : currentDetections) {
-                    if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
+                for (AprilTagDetection tag : currentDetections) {
+                    if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                         tagOfInterest = tag;
                         tagFound = true;
                         break;
                     }
                 }
 
-                if(tagFound) {
+                if (tagFound) {
                     telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
                     tagToTelemetry(tagOfInterest);
                 } else {
@@ -169,7 +172,6 @@ public class F2A5aTagAuto extends LinearOpMode
         double junctionDistance = 0;
 
         SetBrakes(true);
-        double autoPower = 0.50;
 
         sleep(2000);
 
@@ -183,7 +185,7 @@ public class F2A5aTagAuto extends LinearOpMode
         DriveForward(2200, autoPower);
         StrafeLeft(540, autoPower);
         // Search for junction TODO: put this stuff in a method.
-        for (int searchIteration = 0; searchIteration<10000; searchIteration++) {
+        for (int searchIteration = 0; searchIteration < 10000; searchIteration++) {
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
             telemetry.addData("Iteration: ", searchIteration);
@@ -195,16 +197,17 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-3) / 6, 0, 0.4, 200);
+        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 3) / 6, 0, 0.4, 200);
         sleep(1000);
         serv0.setPower(0.17);
 
-        for (int cycle = 0; cycle<2; cycle++) {
+        for (int cycle = 0; cycle < 2; cycle++) {
             DriveReverse(25, autoPower);
             // Face cone stack
+            // TODO: SPIN EXACTLY 90 DEGREES LEFT HERE!!!
             SpinLeft(930, 40);
             // Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+cycle*150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 450 + cycle * 150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
@@ -221,7 +224,7 @@ public class F2A5aTagAuto extends LinearOpMode
             SpinRight(930, 40);
             // AIMBOT!!!
             // Search
-            for (int searchIteration = 0; searchIteration<25000; searchIteration++) {
+            for (int searchIteration = 0; searchIteration < 25000; searchIteration++) {
                 junctionLocation = basicPipeline.getJunctionPoint();
                 junctionDistance = basicPipeline.getJunctionDistance();
                 telemetry.addData("Iteration: ", searchIteration);
@@ -233,7 +236,7 @@ public class F2A5aTagAuto extends LinearOpMode
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
-            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-2) / 6, 0, 0.4, 200);
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.4, 200);
             sleep(2000);
             serv0.setPower(0.17);
         }
@@ -243,14 +246,14 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.lift.setPower(0.8);
         DriveReverse(25, autoPower);
 
-        if(tagOfInterest == null){
+        if (tagOfInterest == null) {
             //default trajectory here if preferred
-        }else if(tagOfInterest.id == LEFT){
-            StrafeLeft(1800,70); //high speed because we don't really need precision
-        }else if(tagOfInterest.id == MIDDLE){
+        } else if (tagOfInterest.id == LEFT) {
+            StrafeLeft(1800, 70); //high speed because we don't really need precision
+        } else if (tagOfInterest.id == MIDDLE) {
             // Signal zone 2
             StrafeLeft(600, 70);
-        }else{
+        } else {
             // Signal zone 3
             StrafeRight(600, 70);
         }
@@ -269,10 +272,10 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         y *= -1;
         r *= -1;
-        robot.lf.setTargetPosition((int)((y + r - x)*distance));
-        robot.rf.setTargetPosition((int)((-y + r - x)*distance));
-        robot.lb.setTargetPosition((int)((y + r + x)*distance));
-        robot.rb.setTargetPosition((int)((-y + r + x)*distance));
+        robot.lf.setTargetPosition((int) ((y + r - x) * distance));
+        robot.rf.setTargetPosition((int) ((-y + r - x) * distance));
+        robot.lb.setTargetPosition((int) ((y + r + x) * distance));
+        robot.rb.setTargetPosition((int) ((-y + r + x) * distance));
 
         robot.lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -306,9 +309,9 @@ public class F2A5aTagAuto extends LinearOpMode
 
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
@@ -551,5 +554,17 @@ public class F2A5aTagAuto extends LinearOpMode
         robot.rf.setPower(0);
         robot.lb.setPower(0);
         robot.rb.setPower(0);
+    }
+
+    public void CorrectHeading(double accuracy) {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        float currentAngle = angles.firstAngle;
+        if (currentAngle > -accuracy && currentAngle < accuracy) return;
+        else {
+            if (Math.abs(currentAngle - 360) >= Math.abs(currentAngle))
+                SpinRight((int) (currentAngle * encoderPulseDegrees), autoPower);
+            else if (Math.abs(currentAngle - 360) <= Math.abs(currentAngle))
+                SpinLeft((int) (currentAngle * encoderPulseDegrees), autoPower);
+        }
     }
 }

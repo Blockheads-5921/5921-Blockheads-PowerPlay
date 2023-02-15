@@ -20,8 +20,11 @@
  */
 
 package org.firstinspires.ftc.teamcode.auto;
+
 import android.drm.DrmInfoEvent;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -30,6 +33,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
 import org.firstinspires.ftc.teamcode.common.Constants;
 
@@ -43,8 +52,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import java.util.ArrayList;
 
 @Autonomous(name = "Robot: F5/A2 Apriltag auto", group = "Robot")
-public class F5A2aTagAuto extends LinearOpMode
-{
+public class F5A2aTagAuto extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -62,10 +70,15 @@ public class F5A2aTagAuto extends LinearOpMode
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-     // Tag ID 1,2,3 from the 36h11 family
+    // Tag ID 1,2,3 from the 36h11 family
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
+
+    // gyro stuff
+    BNO055IMU imu;
+    Orientation angles;
+    Acceleration gravity;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -73,22 +86,34 @@ public class F5A2aTagAuto extends LinearOpMode
     HardwareDrive robot = new HardwareDrive();
     private CRServo serv0;
     private final ElapsedTime runtime = new ElapsedTime();
+    final double autoPower = 0.40;
+    final double encoderPulseDegrees = 10.22;
 
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        // cv stuff
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "log920"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            public void onOpened() {
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -97,127 +122,19 @@ public class F5A2aTagAuto extends LinearOpMode
             }
         });
 
-        telemetry.setMsTransmissionInterval(50);
 
-        /*
-         * The INIT-loop:
-         * This REPLACES waitForStart!
-         */
-
-        //it'd be pretty cool to be able to move diagonally
-
-        while (!isStarted() && !isStopRequested()) {
-            ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
-            if(currentDetections.size() != 0) {
-                boolean tagFound = false;
-                for(AprilTagDetection tag : currentDetections) {
-                    if(tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
-                        tagOfInterest = tag;
-                        tagFound = true;
-                        break;
-                    }
-                }
-
-                if(tagFound) {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    tagToTelemetry(tagOfInterest);
-                } else {
-                    telemetry.addLine("No tag found. If this message persists for <~3s lament but proceed.");
-                }
-            }
-            telemetry.update();
-            sleep(20);
-        }
-
-        /*
-         * The START command just came in: now work off the latest snapshot acquired
-         * during the init loop.
-         */
-
-        /* Update the telemetry */
-        if(tagOfInterest != null)
-        {
-            telemetry.addLine("Tag snapshot:\n");
-            tagToTelemetry(tagOfInterest);
-            telemetry.update();
-        }
-        else
-        {
-            telemetry.addLine("Lament! We saw no tag!");
-            telemetry.update();
-        }
-
-        // SCRIPT FOR F5
-
-        SetBrakes(true);
-        double autoPower = 0.40;
-        serv0.setPower(-0.1);
-        sleep(200);
-        StrafeLeft(1200, autoPower);
-        robot.lift.setTargetPosition(Constants.elevatorPositionTop);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
-        DriveForward(2250, autoPower);
-        StrafeRight(540, autoPower); //we're now centered at d2
-        //line up with pole, and drop cone
-        sleep(500);
-        serv0.setPower(0.17);
-
-        for (int i = 0; i<2; i++) {
-            //Face cone stack
-            SpinRight(900, autoPower);
-            //Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom-450+i*150);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            //drive to cone stack
-            DriveForward(1800, autoPower);
-            //grab cone
-            serv0.setPower(-0.1);
-            sleep(300);
-            //raise lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionTop);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            // go to high pole
-            DriveReverse(1750, autoPower);
-            SpinLeft(920, autoPower);
-            //drop cone
-            sleep(300);
-            serv0.setPower(0.17);
-
-        }
-        // we are now in centered on the tile in front of the high junction, facing away from our substation.
-        robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
-        DriveForward(100, autoPower);
-
-        if(tagOfInterest == null){
-            //default trajectory here if preferred
-        }else if(tagOfInterest.id == LEFT){
-            StrafeLeft(600,70); //high speed because we don't really need precision
-        }else if(tagOfInterest.id == MIDDLE){
-            // Signal zone 2
-            StrafeRight(600, 70);
-        }else{
-            // Signal zone 3
-            StrafeRight(1800, 70);
-        }
-        telemetry.addLine("GO GET EM!!!");
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        telemetry.addLine().addData("heading", angles.firstAngle);
         telemetry.update();
-        sleep(3000);
-
-
+        sleep(5000);
     }
 
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
+    void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
@@ -448,7 +365,7 @@ public class F5A2aTagAuto extends LinearOpMode
         }
     }
 
-    private void PickUpCone (int coneHeight) {
+    private void PickUpCone(int coneHeight) {
         robot.lift.setTargetPosition(coneHeight);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.67);
@@ -457,13 +374,13 @@ public class F5A2aTagAuto extends LinearOpMode
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(1.0);
         sleep(1); // idk which ones are fire-and-forget and stuff, let's just pretend
-                            // for now that the lift is at the top
+        // for now that the lift is at the top
         robot.lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.lift.setPower(0);
 
     }
 
-    private void DepositCone(int junctionLevel){
+    private void DepositCone(int junctionLevel) {
         //assumes lift is at bottom
         int targetPos = 0;
         switch (junctionLevel) {
@@ -486,11 +403,11 @@ public class F5A2aTagAuto extends LinearOpMode
         robot.lift.setPower(0); //Brake arm, maybe unnecessary?
         //Drive forward
         SetBrakes(false);
-        DriveForward(100,0.15);
+        DriveForward(100, 0.15);
         //Release cone
         serv0.setPower(0.18);
         //Back up
-        DriveReverse(75,0.30);
+        DriveReverse(75, 0.30);
         sleep(250);
         //lower arm
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);

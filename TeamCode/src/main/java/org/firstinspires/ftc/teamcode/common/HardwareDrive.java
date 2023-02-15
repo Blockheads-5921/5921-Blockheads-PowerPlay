@@ -71,6 +71,7 @@ public class HardwareDrive
     public DcMotorEx  lb   = null;
     public DcMotorEx  rb   = null;
     public DcMotorEx  lift   = null;
+    public
 
 //    public DcMotorEx duckWheel = null;
 //    public DcMotorEx lifter = null;

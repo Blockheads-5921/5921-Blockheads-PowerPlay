@@ -68,6 +68,7 @@ public class Utility {
 
     /**
      * A function that either brakes the robot or allows it to float depending on brakesOn.
+     *
      * @param brakesOn Whether or not to brake the robot completely
      */
     public void SetBrakes(boolean brakesOn) {
@@ -86,8 +87,9 @@ public class Utility {
 
     /**
      * A drive function that allows the robot to strafe right based on a given number of encoder pulses and the amount of power to allocate to the drive motors. Also updates the telemetry monitor.
+     *
      * @param straferightEncoderPulses How many encoder pulses the robot should strafe before stopping
-     * @param drivePower How much power to allocate to the drive motors
+     * @param drivePower               How much power to allocate to the drive motors
      */
     public void StrafeRight(int straferightEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -125,8 +127,9 @@ public class Utility {
 
     /**
      * A drive function that allows the robot to strafe left based on a given number of encoder pulses and the amount of power to allocate to the drive motors. Also updates the telemetry monitor.
+     *
      * @param strafeleftEncoderPulses How many encoder pulses the robot should strafe before stopping
-     * @param drivePower How much power to allocate to the drive motors
+     * @param drivePower              How much power to allocate to the drive motors
      */
     public void StrafeLeft(int strafeleftEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -165,8 +168,9 @@ public class Utility {
 
     /**
      * A function that allows to robot to spin left (counterclockwise). Also updates the telemetry monitor.
+     *
      * @param spinleftEncoderPulses How many encoder pulses the robot should spin before stopping
-     * @param drivePower The amount of power to allocate to the drive motors
+     * @param drivePower            The amount of power to allocate to the drive motors
      */
     public void SpinLeft(int spinleftEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -205,8 +209,9 @@ public class Utility {
 
     /**
      * A function that allows to robot to spin right (clockwise). Also updates the telemetry monitor.
+     *
      * @param spinrightEncoderPulses How many encoder pulses the robot should spin before stopping
-     * @param drivePower The amount of power to allocate to the drive motors
+     * @param drivePower             The amount of power to allocate to the drive motors
      */
     public void SpinRight(int spinrightEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -245,8 +250,9 @@ public class Utility {
 
     /**
      * A function that allows the robot to drive forward based on a given number of encoder pulses. Also updates the telemetry monitor.
+     *
      * @param forwardEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
-     * @param drivePower The amount of power to allocate to the drive motors
+     * @param drivePower           The amount of power to allocate to the drive motors
      */
     public void DriveForward(int forwardEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -285,8 +291,9 @@ public class Utility {
 
     /**
      * A function that allows the robot to drive reverse based on a given number of encoder pulses. Also updates the telemetry monitor.
+     *
      * @param reverseEncoderPulses The amount of encoder pulses the robot should drive forward before stopping
-     * @param drivePower The amount of power to allocate to the drive motors
+     * @param drivePower           The amount of power to allocate to the drive motors
      */
     public void DriveReverse(int reverseEncoderPulses, double drivePower, boolean isOpModeActive) {
         this.robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -330,7 +337,7 @@ public class Utility {
             telemetry.addData("Vewy vewy happi bc dis is working: ", whatIsWorking);
 
             if (whatIsWorking == null) return "";
-            else return whatIsWorking;
+            else return whatIsWorking + " - yay!";
         }
     }
 

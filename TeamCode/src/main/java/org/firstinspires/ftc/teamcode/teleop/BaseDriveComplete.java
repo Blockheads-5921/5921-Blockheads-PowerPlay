@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
+
 import com.acmerobotics.roadrunner.drive.Drive;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,12 +9,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import org.opencv.core.*;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.FtcDashboard;
+
 import org.checkerframework.checker.signedness.qual.Constant;
 import org.firstinspires.ftc.teamcode.auto.BasicPipeline;
 import org.firstinspires.ftc.teamcode.common.Button;
@@ -37,6 +41,7 @@ public class BaseDriveComplete extends LinearOpMode {
     BasicPipeline basicPipeline = new BasicPipeline();
     Point junctionLocation = new Point();
     OpenCvCamera camera;
+
     @Override
     public void runOpMode() {
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
@@ -87,9 +92,9 @@ public class BaseDriveComplete extends LinearOpMode {
         } // all this works because both the lift and left_stick_y are inverted
 
         if (gamepad2.left_trigger > 0.01) {
-            serv0.setPower(0.18 * gamepad2.left_trigger - 0);
+            serv0.setPower(0.25 * gamepad2.left_trigger - 0);
         } else if (gamepad2.right_trigger > 0.01) {
-            serv0.setPower(-0.1 * gamepad2.right_trigger + 0);
+            serv0.setPower(-0.15 * gamepad2.right_trigger + 0);
         }
 
         if (gamepad2.right_stick_y > 0 & gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0)
