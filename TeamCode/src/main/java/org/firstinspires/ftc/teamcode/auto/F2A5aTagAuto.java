@@ -101,7 +101,6 @@ public class F2A5aTagAuto extends LinearOpMode {
         robot.init(hardwareMap);
         serv0 = hardwareMap.get(CRServo.class, "serv0");
         // adding gyro code
-        /*
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -111,7 +110,6 @@ public class F2A5aTagAuto extends LinearOpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-        */
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "log920"), cameraMonitorViewId);
@@ -152,12 +150,10 @@ public class F2A5aTagAuto extends LinearOpMode {
                     telemetry.addLine("No tag found. If this message persists for <~3s lament but proceed.");
                 }
             }
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("Current angle: ", angles.firstAngle);
             telemetry.update();
             sleep(20);
-        }
-
-        while (!isStarted() && !isStopRequested()) {
-            telemetry.addLine("init loop");
         }
 
         // Drivers pressed play, switch pipeline to detect junctions
@@ -167,13 +163,16 @@ public class F2A5aTagAuto extends LinearOpMode {
 
         // SCRIPT FOR F2
 
-
         Point junctionLocation = new Point();
         double junctionDistance = 0;
 
         SetBrakes(true);
-
-        sleep(2000);
+        CorrectHeading3(90,0.6,0.1);
+        sleep(500);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        telemetry.addData("Current angle after turning: ", angles.firstAngle);
+        telemetry.update();
+        sleep(100000);
 
         serv0.setPower(-0.1);
         sleep(200);
@@ -204,8 +203,7 @@ public class F2A5aTagAuto extends LinearOpMode {
         for (int cycle = 0; cycle < 2; cycle++) {
             DriveReverse(25, autoPower);
             // Face cone stack
-            // TODO: SPIN EXACTLY 90 DEGREES LEFT HERE!!!
-            SpinLeft(930, 40);
+            CorrectHeading3(90, autoPower, 0.5);
             // Lower lift
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 450 + cycle * 150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -224,7 +222,7 @@ public class F2A5aTagAuto extends LinearOpMode {
             SpinRight(930, 40);
             // AIMBOT!!!
             // Search
-            for (int searchIteration = 0; searchIteration < 25000; searchIteration++) {
+            for (int searchIteration = 0; searchIteration < 10000; searchIteration++) {
                 junctionLocation = basicPipeline.getJunctionPoint();
                 junctionDistance = basicPipeline.getJunctionDistance();
                 telemetry.addData("Iteration: ", searchIteration);
@@ -556,15 +554,65 @@ public class F2A5aTagAuto extends LinearOpMode {
         robot.rb.setPower(0);
     }
 
-    public void CorrectHeading(double accuracy) {
+    public void CorrectHeading(double accuracy, double desiredAngle) {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         float currentAngle = angles.firstAngle;
         if (currentAngle > -accuracy && currentAngle < accuracy) return;
         else {
-            if (Math.abs(currentAngle - 360) >= Math.abs(currentAngle))
+            if (Math.abs(currentAngle - 270) >= Math.abs(currentAngle))
                 SpinRight((int) (currentAngle * encoderPulseDegrees), autoPower);
-            else if (Math.abs(currentAngle - 360) <= Math.abs(currentAngle))
+            else if (Math.abs(currentAngle - 270) <= Math.abs(currentAngle))
                 SpinLeft((int) (currentAngle * encoderPulseDegrees), autoPower);
         }
+    }
+
+    public void CorrectHeading2(double desiredAngle) {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = angles.firstAngle;
+        telemetry.addData("Angle before turning: ", heading);
+        telemetry.update();
+        SpinRight((int) ((heading-desiredAngle) * encoderPulseDegrees), 1.00);
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        heading = angles.firstAngle;
+        telemetry.addData("Angle after turning: ", heading);
+        telemetry.update();
+    }
+
+    public void CorrectHeading3 (double desiredAngle, double drivePower, double margin) {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = angles.firstAngle;
+        double motorCoef; //Slows motor down if we're close to target and reverses direction if we overshot
+
+        robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.lf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.lb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rf.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        robot.rb.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        while (heading > desiredAngle + margin || heading < desiredAngle - margin) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            heading = angles.firstAngle;
+            motorCoef = Math.signum(desiredAngle - heading);
+
+            // slow down if we're close
+            if (Math.abs(desiredAngle - heading) < 10) {motorCoef /= 3;}
+            telemetry.addData("Current angle: ", heading);
+            telemetry.update();
+
+            robot.lf.setPower(motorCoef*drivePower);
+            robot.rf.setPower(motorCoef*drivePower);
+            robot.lb.setPower(motorCoef*drivePower);
+            robot.rb.setPower(motorCoef*drivePower);
+            sleep(20);
+        }
+
+        robot.lf.setPower(0);
+        robot.rf.setPower(0);
+        robot.lb.setPower(0);
+        robot.rb.setPower(0);
     }
 }

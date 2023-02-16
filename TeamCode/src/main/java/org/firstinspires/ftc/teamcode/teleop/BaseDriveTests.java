@@ -17,6 +17,7 @@ public class BaseDriveTests extends LinearOpMode {
     HardwareDrive robot = new HardwareDrive();
     private Constants constants = new Constants();
     private CRServo serv0;
+    private CRServo serv1;
     private ElapsedTime runtime = new ElapsedTime();
     private Button lifterButton = new Button();
     private Button lifterBottomButton = new Button();
@@ -27,6 +28,7 @@ public class BaseDriveTests extends LinearOpMode {
     @Override
     public void runOpMode() {
         serv0 = hardwareMap.get(CRServo.class, "serv0");
+        serv1 = hardwareMap.get(CRServo.class, "serv1");
         robot.init(hardwareMap);
         telemetry.addData("Say", "Hello Driver");
         runtime.reset();
@@ -68,8 +70,7 @@ public class BaseDriveTests extends LinearOpMode {
             telemetry.addLine("Lift position OK");
         }
 
-        if (gamepad2.left_trigger > 0.01) {serv0.setPower(0.22 * gamepad2.left_trigger - 0);}
-        else if  (gamepad2.right_trigger > 0.01) {serv0.setPower(-0.1 * gamepad2.right_trigger + 0);}
+        if (gamepad2.left_trigger > 0.01) {serv1.setPower(gamepad2.left_trigger);}
 
         double drivePower = 0.4;
         if (gamepad1.right_bumper) {drivePower = 1;}

@@ -112,20 +112,15 @@ public class BaseDriveCompleteGyro extends LinearOpMode {
         robot.lb.setPower((directionY + directionR + directionX) * drivePower);
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
 
-        /*
-                if (gamepad2.y == true) {MoveLiftTo(3); telemetry.addLine("Button y pressed");}
-        if (gamepad2.x == true) {MoveLiftTo(2);}
-        if (gamepad2.a == true) {MoveLiftTo(1);}
-        if (gamepad2.b == true) {MoveLiftTo(0);}
-        if (gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up) {MoveLiftTo(-1);}
-         */
-
         // Make sure we're not letting lift over-extend...
-        if (liftPos < Constants.elevatorPositionTop) robot.lift.setPower((liftPower) * 0.1);
-            // or over-retract
-        else if (liftPos > Constants.elevatorPositionBottom && (gamepad2.right_stick_y > 0))
-            robot.lift.setPower((liftPower) * 0.01);
-        else robot.lift.setPower((liftPower - 0.001) * 1);
+        if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {
+            robot.lift.setPower((gamepad2.left_stick_y) * 0.1 - -0.001);
+        }
+        // or over-retract
+        else if (liftPos > Constants.elevatorPositionBottom && gamepad2.right_stick_y > 0) {
+            robot.lift.setPower((gamepad2.left_stick_y) * 0.01);
+        }
+        else {robot.lift.setPower((liftPower - 0.001) * 1);} // the *1 is there to adjust lift speed
 
     }
 
@@ -162,35 +157,6 @@ public class BaseDriveCompleteGyro extends LinearOpMode {
             robot.rf.setPower(-power);
             robot.lb.setPower(power);
             robot.rb.setPower(-power);
-        }
-    }
-
-    private void MoveLiftTo(int jLevel) {
-        telemetry.addData("Beginning MoveLiftTo; jLevel ", jLevel);
-        telemetry.update();
-        int jCounts = true ? Constants.elevatorPositionBottom : null;
-        switch (jLevel) {
-            case -1:
-                jCounts = Constants.elevatorPositionBottom;
-            case 0:
-                jCounts = Constants.elevatorPositionBottom - 100; //ground junction
-            case 1:
-                jCounts = Constants.elevatorPositionLow;
-            case 2:
-                jCounts = Constants.elevatorPositionMid;
-            case 3:
-                jCounts = Constants.elevatorPositionTop;
-        }
-        robot.lift.setTargetPosition(jCounts);
-        robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.7);
-        telemetry.addData("Lift being given power and sent to ", jLevel);
-        telemetry.update();
-        sleep(jCounts * 750);
-        if (jLevel != -1) {
-            robot.lift.setTargetPosition(jCounts + 5);
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.01);
         }
     }
 
