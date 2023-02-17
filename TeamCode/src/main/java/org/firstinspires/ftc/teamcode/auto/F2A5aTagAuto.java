@@ -167,12 +167,10 @@ public class F2A5aTagAuto extends LinearOpMode {
         double junctionDistance = 0;
 
         SetBrakes(true);
-        CorrectHeading3(90,0.6,0.1);
         sleep(500);
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         telemetry.addData("Current angle after turning: ", angles.firstAngle);
         telemetry.update();
-        sleep(100000);
 
         serv0.setPower(-0.1);
         sleep(200);
@@ -209,7 +207,7 @@ public class F2A5aTagAuto extends LinearOpMode {
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(0.8);
             // drive to cone stack
-            DriveForward(1750, autoPower);
+            DriveForward(1800, autoPower);
             // grab cone
             serv0.setPower(-0.1);
             sleep(300);
@@ -349,7 +347,6 @@ public class F2A5aTagAuto extends LinearOpMode {
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
     private void StrafeLeft(int strafeleftEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -384,7 +381,6 @@ public class F2A5aTagAuto extends LinearOpMode {
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
     private void SpinLeft(int spinleftEncoderPulses, double drivePower) {
 
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -420,7 +416,6 @@ public class F2A5aTagAuto extends LinearOpMode {
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
     private void SpinRight(int spinrightEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -455,7 +450,6 @@ public class F2A5aTagAuto extends LinearOpMode {
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
     private void DriveForward(int forwardEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -490,7 +484,6 @@ public class F2A5aTagAuto extends LinearOpMode {
                     robot.rf.getCurrentPosition(), robot.lb.getCurrentPosition(), robot.rb.getCurrentPosition());
         }
     }
-
     private void DriveReverse(int reverseEncoderPulses, double drivePower) {
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -554,7 +547,7 @@ public class F2A5aTagAuto extends LinearOpMode {
         robot.rb.setPower(0);
     }
 
-    public void CorrectHeading(double accuracy, double desiredAngle) {
+    public void CorrectHeading(double accuracy) {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         float currentAngle = angles.firstAngle;
         if (currentAngle > -accuracy && currentAngle < accuracy) return;
@@ -578,10 +571,16 @@ public class F2A5aTagAuto extends LinearOpMode {
         telemetry.update();
     }
 
+    /**
+     * A method that aligns the robot with a specific heading.
+     * @param desiredAngle The heading the robot should have after the method's execution
+     * @param drivePower The power given to the motor during drive. This is constant.
+     * @param margin The margin of error allocated to the robot.
+     */
     public void CorrectHeading3 (double desiredAngle, double drivePower, double margin) {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double heading = angles.firstAngle;
-        double motorCoef; //Slows motor down if we're close to target and reverses direction if we overshot
+        double motorCoef; // Slows motor down if we're close to target and reverses direction if we overshot
 
         robot.lf.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         robot.lb.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -599,7 +598,7 @@ public class F2A5aTagAuto extends LinearOpMode {
             motorCoef = Math.signum(desiredAngle - heading);
 
             // slow down if we're close
-            if (Math.abs(desiredAngle - heading) < 10) {motorCoef /= 3;}
+            if (Math.abs(desiredAngle - heading) < 10) motorCoef /= 3;
             telemetry.addData("Current angle: ", heading);
             telemetry.update();
 
