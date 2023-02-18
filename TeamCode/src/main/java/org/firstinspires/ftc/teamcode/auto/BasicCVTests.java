@@ -63,7 +63,7 @@ public class BasicCVTests extends LinearOpMode {
 
         // init-loop
         while(!isStarted() && !isStopRequested()) {
-            /*
+
             iteration++;
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
@@ -76,7 +76,6 @@ public class BasicCVTests extends LinearOpMode {
 
             telemetry.update();
 
-             */
         }
 
         // PUT AIMBOT SCRIPT HERE
@@ -104,7 +103,9 @@ public class BasicCVTests extends LinearOpMode {
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
         sleep(2000);
-        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance-4) / 6, 0, 0.25, 200);
+        if (junctionDistance < 8) { // Fail-safe in case the pole is outside our FOV
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 4) / 6, 0, 0.25, 200);
+        }
         sleep(3000);
         serv0.setPower(0.17);
     }
