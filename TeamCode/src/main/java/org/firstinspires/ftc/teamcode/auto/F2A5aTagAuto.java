@@ -189,22 +189,21 @@ public class F2A5aTagAuto extends LinearOpMode {
         // Adjust and drop!
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
+        robot.lift.setPower(1);
         if (junctionDistance < 8) { // Failsafe in case we recognize a faraway junction
-            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.4, 200);
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.6, 200);
         }
         sleep(1000);
         serv0.setPower(0.17);
 
         for (int cycle = 0; cycle < 2; cycle++) {
-            DriveReverse(50, autoPower);
             // Face cone stack
             CorrectHeading3(90, autoPower, 0.25);
             telemetry.addData("Angle after adjustment: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
             // Lower lift
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 500 + cycle * 150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
+            robot.lift.setPower(1);
             // drive to cone stack
             DriveForward(1800, autoPower);
             // grab cone
@@ -213,7 +212,8 @@ public class F2A5aTagAuto extends LinearOpMode {
             // raise lift partways so we can still see junction
             robot.lift.setTargetPosition(Constants.elevatorPositionLow);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
+            robot.lift.setPower(1);
+            sleep(300);
             // go to high pole
             DriveReverse(1750, autoPower);
             SpinRight(920, 40);
@@ -230,11 +230,11 @@ public class F2A5aTagAuto extends LinearOpMode {
             // Adjust and drop!
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
+            robot.lift.setPower(1);
             if (junctionDistance < 8) { // Failsafe in case we recognize a faraway junction
                 TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.4, 200);
             }
-            sleep(2000);
+            sleep(1000);
             serv0.setPower(0.17);
         }
         // we are now in centered in front of the high junction, facing away from our substation.
