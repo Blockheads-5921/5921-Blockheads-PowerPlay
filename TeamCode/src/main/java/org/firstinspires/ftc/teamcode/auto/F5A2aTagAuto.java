@@ -58,7 +58,7 @@ import org.opencv.core.*;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "F2/A5 Apriltag auto", group = "Robot")
+@Autonomous(name = "F5/A2 Apriltag auto", group = "Robot")
 public class F5A2aTagAuto extends LinearOpMode {
     // gyro stuff
     BNO055IMU imu;
@@ -198,7 +198,8 @@ public class F5A2aTagAuto extends LinearOpMode {
 
         for (int cycle = 0; cycle < 2; cycle++) {
             // Face cone stack
-            CorrectHeading3(270, autoPower, 0.25);
+            DriveReverse(50, autoPower);
+            CorrectHeading3(-90, autoPower, 0.25);
             telemetry.addData("Angle after adjustment: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
             // Lower lift
             robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 500 + cycle * 150);
@@ -208,14 +209,14 @@ public class F5A2aTagAuto extends LinearOpMode {
             DriveForward(1800, autoPower);
             // grab cone
             serv0.setPower(-0.1);
-            sleep(300);
+            sleep(500);
             // raise lift partways so we can still see junction
             robot.lift.setTargetPosition(Constants.elevatorPositionLow);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.lift.setPower(1);
             sleep(300);
             // go to high pole
-            DriveReverse(1750, autoPower);
+            DriveReverse(1700, autoPower);
             SpinLeft(920, 40);
             // AIMBOT!!!
             // Search
@@ -247,13 +248,13 @@ public class F5A2aTagAuto extends LinearOpMode {
         if (tagOfInterest == null) {
             //default trajectory here if preferred
         } else if (tagOfInterest.id == LEFT) {
-            StrafeLeft(1800, 70); //high speed because we don't really need precision
+            StrafeLeft(600, 70);
         } else if (tagOfInterest.id == MIDDLE) {
             // Signal zone 2
-            StrafeLeft(600, 70);
+            StrafeRight(600, 70);
         } else {
             // Signal zone 3
-            StrafeRight(600, 70);
+            StrafeRight(1800, 70);
         }
         telemetry.addLine("GO GET EM!!!");
         telemetry.update();
