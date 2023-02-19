@@ -167,22 +167,18 @@ public class F2A5aTagAuto extends LinearOpMode {
         double junctionDistance = 0;
 
         SetBrakes(true);
-        sleep(500);
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        telemetry.addData("Current angle after turning: ", angles.firstAngle);
-        telemetry.update();
 
         serv0.setPower(-0.1);
         sleep(200);
         // Drive around signal cone to target junction
-        StrafeRight(1200, autoPower);
+        StrafeRight(1000, autoPower);
         robot.lift.setTargetPosition(Constants.elevatorPositionLow);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
         DriveForward(2200, autoPower);
-        StrafeLeft(540, autoPower);
+        StrafeLeft(600, autoPower);
         // Search for junction TODO: put this stuff in a method.
-        for (int searchIteration = 0; searchIteration < 10000; searchIteration++) {
+        for (int searchIteration = 0; searchIteration < 20000; searchIteration++) {
             junctionLocation = basicPipeline.getJunctionPoint();
             junctionDistance = basicPipeline.getJunctionDistance();
             telemetry.addData("Iteration: ", searchIteration);
@@ -193,34 +189,41 @@ public class F2A5aTagAuto extends LinearOpMode {
         // Adjust and drop!
         robot.lift.setTargetPosition(Constants.elevatorPositionTop);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.lift.setPower(0.8);
-        TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 3) / 6, 0, 0.4, 200);
+        robot.lift.setPower(1);
+        if (junctionDistance < 8) { // Failsafe in case we recognize a faraway junction
+            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.6, 200);
+        }
         sleep(1000);
-        serv0.setPower(0.17);
+        serv0.setPower(0.22);
 
         for (int cycle = 0; cycle < 2; cycle++) {
-            DriveReverse(25, autoPower);
             // Face cone stack
-            CorrectHeading3(90, autoPower, 0.5);
+            DriveReverse(50, autoPower);
+            CorrectHeading3(90, autoPower, 0.25);
+            telemetry.addData("Angle after adjustment: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+            telemetry.update();
             // Lower lift
-            robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 450 + cycle * 150);
+            robot.lift.setTargetPosition(Constants.elevatorPositionBottom - 550 + cycle * 150);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
+            robot.lift.setPower(1);
             // drive to cone stack
             DriveForward(1800, autoPower);
             // grab cone
             serv0.setPower(-0.1);
-            sleep(300);
+            telemetry.addLine("THING SOMETHING IDK WHAT TO WRITE \n SERVO GRABBING VERY COOL IMPORTANT \nLOOK AT THIS");
+            telemetry.update();
+            sleep(1000);
             // raise lift partways so we can still see junction
             robot.lift.setTargetPosition(Constants.elevatorPositionLow);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
+            robot.lift.setPower(1);
             // go to high pole
             DriveReverse(1750, autoPower);
-            SpinRight(930, 40);
+            StrafeRight(50, autoPower);
+            SpinRight(920, 40);
             // AIMBOT!!!
             // Search
-            for (int searchIteration = 0; searchIteration < 10000; searchIteration++) {
+            for (int searchIteration = 0; searchIteration < 20000; searchIteration++) {
                 junctionLocation = basicPipeline.getJunctionPoint();
                 junctionDistance = basicPipeline.getJunctionDistance();
                 telemetry.addData("Iteration: ", searchIteration);
@@ -231,20 +234,23 @@ public class F2A5aTagAuto extends LinearOpMode {
             // Adjust and drop!
             robot.lift.setTargetPosition(Constants.elevatorPositionTop);
             robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.lift.setPower(0.8);
-            TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.4, 200);
-            sleep(2000);
-            serv0.setPower(0.17);
+            robot.lift.setPower(1);
+            if (junctionDistance < 8) { // Failsafe in case we recognize a faraway junction
+                TeleopStyleDrive((junctionLocation.x - 400) / 400, (junctionDistance - 2) / 6, 0, 0.4, 200);
+            }
+            sleep(1000);
+            serv0.setPower(0.22);
         }
         // we are now in centered in front of the high junction, facing away from our substation.
         robot.lift.setTargetPosition(Constants.elevatorPositionBottom);
         robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.lift.setPower(0.8);
-        DriveReverse(25, autoPower);
+
 
         if (tagOfInterest == null) {
             //default trajectory here if preferred
         } else if (tagOfInterest.id == LEFT) {
+            SpinRight(50, autoPower);
             StrafeLeft(1800, 70); //high speed because we don't really need precision
         } else if (tagOfInterest.id == MIDDLE) {
             // Signal zone 2
@@ -598,7 +604,7 @@ public class F2A5aTagAuto extends LinearOpMode {
             motorCoef = Math.signum(desiredAngle - heading);
 
             // slow down if we're close
-            if (Math.abs(desiredAngle - heading) < 10) motorCoef /= 3;
+            if (Math.abs(desiredAngle - heading) < 20) motorCoef /= 4;
             telemetry.addData("Current angle: ", heading);
             telemetry.update();
 
