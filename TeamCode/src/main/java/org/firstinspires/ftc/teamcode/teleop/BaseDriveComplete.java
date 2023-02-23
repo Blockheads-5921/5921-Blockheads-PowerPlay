@@ -23,6 +23,8 @@ public class BaseDriveComplete extends LinearOpMode {
     private final HardwareDrive robot = new HardwareDrive();
     private final ElapsedTime runtime = new ElapsedTime();
 
+    double drivePower = 0.40;
+
     @Override
     public void runOpMode() {
         composeTelemetry();
@@ -35,21 +37,13 @@ public class BaseDriveComplete extends LinearOpMode {
         waitForStart();
 
         robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        while (opModeIsActive()) loop1();
-    }
-
-
-    private void loop1() {
-        UpdateGripper();
-        UpdatePlayers();
-        UpdateTelemetry();
-    }
-
-    private void UpdatePlayers() {
-        double drivePower = 0.40;
-        if (gamepad1.right_bumper) drivePower = 1;
-        DriveTrainBase(drivePower);
-        DriveMicroAdjust();
+        while (opModeIsActive()) {
+            UpdateGripper();
+            UpdateTelemetry();
+            if (gamepad1.right_bumper) drivePower = 1;
+            DriveTrainBase(drivePower);
+            DriveMicroAdjust();
+        }
     }
 
     @Utility.Encapsulate
@@ -61,13 +55,13 @@ public class BaseDriveComplete extends LinearOpMode {
 
         if (gamepad1.left_stick_x < 0.2 && gamepad1.left_stick_x > -0.2) directionX = 0;
         if (gamepad1.left_stick_y < 0.2 && gamepad1.left_stick_y > -0.2) directionY = 0;
-        int liftPos = robot.lift.getCurrentPosition();
 
         robot.lf.setPower((directionY + directionR - directionX) * drivePower);
         robot.rf.setPower((-directionY + directionR - directionX) * drivePower);
         robot.lb.setPower((directionY + directionR + directionX) * drivePower);
         robot.rb.setPower((-directionY + directionR + directionX) * drivePower);
 
+        int liftPos = robot.lift.getCurrentPosition();
         if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {
             robot.lift.setPower((gamepad2.left_stick_y) * 0.1 - -0.001);
         }
