@@ -21,35 +21,26 @@
 
 package org.firstinspires.ftc.teamcode.auto;
 
-import android.drm.DrmInfoEvent;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.firstinspires.ftc.teamcode.common.Utility;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.teamcode.common.HardwareDrive;
-import org.firstinspires.ftc.teamcode.auto.BasicPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -63,7 +54,6 @@ public class F5A2aTagAuto extends LinearOpMode {
     // gyro stuff
     BNO055IMU imu;
     Orientation angles;
-    Acceleration gravity;
     double autoPower = 0.50;
     double encoderPulseDegrees = 10.22222222;
 
@@ -91,15 +81,12 @@ public class F5A2aTagAuto extends LinearOpMode {
 
     AprilTagDetection tagOfInterest = null;
 
-    Constants constants = new Constants();
     HardwareDrive robot = new HardwareDrive();
-    private CRServo serv0;
-    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
         robot.init(hardwareMap);
-        serv0 = hardwareMap.get(CRServo.class, "serv0");
+        CRServo serv0 = hardwareMap.get(CRServo.class, "serv0");
         // adding gyro code
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -138,17 +125,12 @@ public class F5A2aTagAuto extends LinearOpMode {
                 for (AprilTagDetection tag : currentDetections) {
                     if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                         tagOfInterest = tag;
-                        tagFound = true;
                         break;
                     }
                 }
 
-                if (tagFound) {
-                    telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                    tagToTelemetry(tagOfInterest);
-                } else {
-                    telemetry.addLine("No tag found. If this message persists for <~3s lament but proceed.");
-                }
+                telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                tagToTelemetry(tagOfInterest);
             }
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             telemetry.addData("Current angle: ", angles.firstAngle);
