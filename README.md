@@ -3,17 +3,17 @@ If the current season is still Powerplay, please talk to Luke or Leo because we 
 also talk to Luke or Leo if you have any questions about anything.
 Some questions that I had when starting out, with answers:
 
-Q: Where are the actual programs that get run?
+Q: Where are the actual programs that get run? 
 A: Teamcode/src/main/java/org/firstinspires/ftc/teamcode, take a look at the readme there
 
-Q: What's an opmode?
+Q: What's an opmode? 
 A: Basically, a program for the robot to run.
 
-Q: Where is the actual code that gets run, or the "main" method?
+Q: Where is the actual code that gets run, or the "main" method? 
 A: It doesn't really matter, just put your stuff in a file in teamcode.
 
-Q: Where are the motors and things defined?
-A: For this codebase, Teamcode/src/main/java/org/firstinspires/ftc/teamcode/common/HardwareDrive.java
+Q: Where are the motors and things defined? 
+A: For this codebase, *Teamcode/src/main/java/org/firstinspires/ftc/teamcode/common/HardwareDrive.java*
 
-Q: What do I need to add to Android Studio to program for FTC?
-A: IdeaVim, or an equivalent (not really). You can install IdeaVim in File>Settings>Plugins.
+Q: How do I run a program? 
+A: Make sure the program you want to run extends the LinearOpMode abstract, and also make sure it's annotated with `@Autonomous` or `@TeleOp`, and then run it from the driver station. Check out *Teamcode/src/main/java/org/firstinspires/ftc/teamcode/teleop/BaseDriveComplete*
