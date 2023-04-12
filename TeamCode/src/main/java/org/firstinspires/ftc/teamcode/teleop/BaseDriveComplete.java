@@ -2,6 +2,13 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.roadrunner.drive.Drive;
 import com.qualcomm.ftccommon.SoundPlayer;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -33,6 +40,8 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 //@Disabled
 public class BaseDriveComplete extends LinearOpMode {
     /* Declare OpMode members. */
+    BNO055IMU imu;
+    Orientation angles;
     HardwareDrive robot = new HardwareDrive();
     private final Constants constants = new Constants();
     private CRServo serv0;
@@ -42,8 +51,20 @@ public class BaseDriveComplete extends LinearOpMode {
     Point junctionLocation = new Point();
     OpenCvCamera camera;
 
+
     @Override
     public void runOpMode() {
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
         runtime.reset();
         serv0 = hardwareMap.get(CRServo.class, "serv0");
@@ -74,11 +95,27 @@ public class BaseDriveComplete extends LinearOpMode {
         if (gamepad1.right_bumper) drivePower = 1;
 
         int liftPos = robot.lift.getCurrentPosition();
+        double rcw = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x);
 
-        robot.lf.setPower((gamepad1.left_stick_y + -gamepad1.right_stick_x - gamepad1.left_stick_x) * drivePower);
-        robot.rf.setPower((-gamepad1.left_stick_y + -gamepad1.right_stick_x - gamepad1.left_stick_x) * drivePower);
-        robot.lb.setPower((gamepad1.left_stick_y + -gamepad1.right_stick_x + gamepad1.left_stick_x) * drivePower);
-        robot.rb.setPower((-gamepad1.left_stick_y + -gamepad1.right_stick_x + gamepad1.left_stick_x) * drivePower);
+        double forwrd = gamepad1.left_stick_y;
+        double strafe = gamepad1.left_stick_x;
+
+        double pi = 3.1415926;
+
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double heading = angles.firstAngle;
+
+        double gyro_radians = heading * Math.PI/180;
+        double temp = forwrd * Math.cos(gyro_radians) +
+                strafe * Math.sin(gyro_radians);
+        strafe = -forwrd * Math.sin(gyro_radians) +
+                strafe * Math.cos(gyro_radians);
+        forwrd = temp;
+
+        robot.lf.setPower((forwrd + -gamepad1.right_stick_x - strafe) * drivePower);
+        robot.rf.setPower((-forwrd + -gamepad1.right_stick_x - strafe) * drivePower);
+        robot.lb.setPower((forwrd + -gamepad1.right_stick_x + strafe) * drivePower);
+        robot.rb.setPower((-forwrd + -gamepad1.right_stick_x + strafe) * drivePower);
 
         // Make sure we're not letting lift over-extend...kenny wuz here
         if (liftPos < Constants.elevatorPositionTop && gamepad2.right_stick_y < 0) {
