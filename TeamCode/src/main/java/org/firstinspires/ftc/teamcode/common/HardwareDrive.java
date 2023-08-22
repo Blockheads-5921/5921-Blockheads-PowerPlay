@@ -1,7 +1,11 @@
+/* just telling android studio that this file is inside this directory */
 package org.firstinspires.ftc.teamcode.common;
 
-/* any packages we need to import for our code */
-
+/* 
+any packages we need to import for our code - these can't actually 
+be found in the codebase and are instead fetched by android studio 
+when you build your program 
+*/
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,20 +19,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
+/* every java file needs a class that matches its name! */
 public class HardwareDrive {
-    /* declare the motors and servo and set them to null */
-    public DcMotorEx lf = null;
-    public DcMotorEx rf = null;
-    public DcMotorEx lb = null;
-    public DcMotorEx rb = null;
-    public DcMotorEx lift = null;
-    public CRServo serv0;
+    /* 
+    declare the motors and servo and set them to null
+    note that not all of these motors may be applicable to
+    your season!!
+    */
+    public DcMotorEx lf = null; // left front motor/wheel
+    public DcMotorEx rf = null; // right front motor/wheel
+    public DcMotorEx lb = null; // left back motor/wheel
+    public DcMotorEx rb = null; // right back motor/wheel
+    public DcMotorEx lift = null; // the motor that operates our lift
+    public CRServo serv0; // the servomotor that operates our claw
 
     /* declare our gyro (imu) and camera */
-    public BNO055IMU imu;
-    public OpenCvCamera camera;
-    public Orientation angles;
-    public Acceleration gravity;
+    public BNO055IMU imu; // every control hub has a built-in gyroscope and it is initialized here
+    public OpenCvCamera camera; // we bought a camera to assist in image recognition
+    public Orientation angles; // we can use this to figure out the roll, pitch and yaw of the robot with the imu/gyro
+    public Acceleration gravity; // idk what this is
 
     /**
      * The initialization method used in every driveMode and
@@ -38,7 +47,12 @@ public class HardwareDrive {
      * @param hwMap This parameter should be passed the abstract hardwareMap member in every LinearOpMode.
      */
     public void init(HardwareMap hwMap) {
-        /* map each motor to a variable we can use in our code */
+        /* 
+        map each motor to a variable we can use in our code - pretty self explanatory
+        basically, on the control hub, we give each motor/servo a name
+        using the HardwareMap parameter that you pass, the function will run .get() on 
+        each motor/servo which basically connects the code to the hardware
+        */
         lf = hwMap.get(DcMotorEx.class, "left_front");
         rf = hwMap.get(DcMotorEx.class, "right_front");
         lb = hwMap.get(DcMotorEx.class, "left_back");
@@ -46,7 +60,7 @@ public class HardwareDrive {
         lift = hwMap.get(DcMotorEx.class, "lift");
         serv0 = hwMap.get(CRServo.class, "serv0");
 
-        /* all of our gyro initialization stuff */
+        /* all of our gyro initialization stuff - you probably don't need to worry about this*/
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -54,6 +68,7 @@ public class HardwareDrive {
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        /* we use .get() on the imu as well! */
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
@@ -81,6 +96,11 @@ public class HardwareDrive {
         rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        /* 
+        wow, you read the whole thing
+        go to the teleop folder and look at BaseDriveComplete now!
+        */
     }
 }
 
