@@ -1,3 +1,7 @@
+# HEY!!!
+***
+if you're on the ftc team for the 2023-2024 season, please go straight to HardwareDrive here: `/TeamCode`
+
 Hello and welcome to team 5921, or the La Canada Engineering Club's repository for the 2022-2023 FTC season powerplay!
 If the current season is still Powerplay, please talk to Luke or Leo because we need more programmers. If it's a future season,
 also talk to Luke or Leo if you have any questions about anything.
