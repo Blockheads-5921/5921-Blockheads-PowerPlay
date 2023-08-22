@@ -1,6 +1,5 @@
 # HEY!!!
-***
-if you're on the ftc team for the 2023-2024 season, please go straight to HardwareDrive here: `/TeamCode`
+important message from luke d: if you're on the ftc team for the 2023-2024 season, please go straight to [HardwareDrive](https://github.com/Blockheads-5921/5921-Blockheads-PowerPlay/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/common/HardwareDrive.java). it has really good documentation and is great to start out with.
 
 Hello and welcome to team 5921, or the La Canada Engineering Club's repository for the 2022-2023 FTC season powerplay!
 If the current season is still Powerplay, please talk to Luke or Leo because we need more programmers. If it's a future season,
